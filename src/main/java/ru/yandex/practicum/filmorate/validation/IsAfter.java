@@ -9,7 +9,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 
-@Constraint(validatedBy= IsAfterValidator.class)
+@Constraint(validatedBy = IsAfterValidator.class)
 @Target({FIELD, METHOD})
 @Retention(RUNTIME)
 public @interface IsAfter {
