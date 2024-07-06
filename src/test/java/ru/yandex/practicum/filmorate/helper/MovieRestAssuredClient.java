@@ -21,7 +21,7 @@ public class MovieRestAssuredClient extends BaseRestAssuredClient {
                     .contentType(JSON)
                     .accept(JSON)
                     .body(movie)
-                    .post(URL_PREFIX);
+                    .post(urlPrefix);
         } catch (Exception e) {
             fail("Exception occurred: " + e.getClass() + " " + e.getMessage());
         }
@@ -34,7 +34,7 @@ public class MovieRestAssuredClient extends BaseRestAssuredClient {
             response = given()
                     .config(config)
                     .accept(JSON)
-                    .get(URL_PREFIX + "/all");
+                    .get(urlPrefix + "/all");
         } catch (Exception e) {
             fail("Exception occurred: " + e.getClass() + " " + e.getMessage());
         }
@@ -48,7 +48,7 @@ public class MovieRestAssuredClient extends BaseRestAssuredClient {
                     .config(config)
                     .contentType(JSON)
                     .body(movie)
-                    .put(URL_PREFIX + "/" + movie.getId());
+                    .put(urlPrefix + "/" + movie.getId());
         } catch (Exception e) {
             fail("Exception occurred: " + e.getClass() + " " + e.getMessage());
         }

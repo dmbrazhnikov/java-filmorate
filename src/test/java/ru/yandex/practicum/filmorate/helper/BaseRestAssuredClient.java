@@ -5,11 +5,11 @@ import io.restassured.config.RestAssuredConfig;
 
 public abstract class BaseRestAssuredClient {
 
-    protected final String URL_PREFIX;
+    protected final String urlPrefix;
     protected static RestAssuredConfig config;
 
     public BaseRestAssuredClient(String urlPrefix) {
-        URL_PREFIX = urlPrefix;
+        this.urlPrefix = urlPrefix;
         config = RestAssuredConfig.config()
                 .httpClient(HttpClientConfig.httpClientConfig()
                         .setParam("http.socket.timeout", 10000)

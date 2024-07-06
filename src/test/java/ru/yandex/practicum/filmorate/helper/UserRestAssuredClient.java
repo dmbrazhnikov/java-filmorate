@@ -21,7 +21,7 @@ public class UserRestAssuredClient extends BaseRestAssuredClient {
                     .contentType(JSON)
                     .accept(JSON)
                     .body(user)
-                    .post(URL_PREFIX);
+                    .post(urlPrefix);
         } catch (Exception e) {
             fail("Exception occurred: " + e.getClass() + " " + e.getMessage());
         }
@@ -34,7 +34,7 @@ public class UserRestAssuredClient extends BaseRestAssuredClient {
             response = given()
                     .config(config)
                     .accept(JSON)
-                    .get(URL_PREFIX + "/all");
+                    .get(urlPrefix + "/all");
         } catch (Exception e) {
             fail("Exception occurred: " + e.getClass() + " " + e.getMessage());
         }
@@ -48,7 +48,7 @@ public class UserRestAssuredClient extends BaseRestAssuredClient {
                     .config(config)
                     .contentType(JSON)
                     .body(user)
-                    .put(URL_PREFIX + "/" + user.getId());
+                    .put(urlPrefix + "/" + user.getId());
         } catch (Exception e) {
             fail("Exception occurred: " + e.getClass() + " " + e.getMessage());
         }
