@@ -1,14 +1,19 @@
 package ru.yandex.practicum.filmorate.validation;
 
 import jakarta.validation.Constraint;
-import java.lang.annotation.ElementType;
+import jakarta.validation.Payload;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Constraint(validatedBy= InThePastValidator.class)
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+
+@Constraint(validatedBy = InThePastValidator.class)
+@Target({FIELD, METHOD})
+@Retention(RUNTIME)
 public @interface InThePast {
     String message() default "Дата должна быть в прошлом";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default {};
 }

@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -22,7 +23,7 @@ public class UserController {
     private static final AtomicInteger idSequence = new AtomicInteger();
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
-    public User add(@RequestBody User user) {
+    public User add(@Validated @RequestBody User user) {
         int userId = idSequence.getAndIncrement();
         user.setId(userId);
         usersById.put(userId, user);
@@ -33,7 +34,7 @@ public class UserController {
 
     @PutMapping(value = "/{userId}", consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(NO_CONTENT)
-    public void update(@RequestBody User user, @PathVariable Integer userId) {
+    public void update(@Validated @RequestBody User user, @PathVariable Integer userId) {
         usersById.put(userId, user);
         log.info("Пользователь с ID {} обновлён", userId);
     }

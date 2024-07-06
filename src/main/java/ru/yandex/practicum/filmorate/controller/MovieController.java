@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Movie;
 import java.util.List;
@@ -20,7 +21,8 @@ public class MovieController {
     private static final AtomicInteger idSequence = new AtomicInteger();
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
-    public Movie add(@RequestBody Movie movie) {
+    @ResponseStatus(CREATED)
+    public Movie add(@Validated @RequestBody Movie movie) {
         int movieId = idSequence.getAndIncrement();
         movie.setId(movieId);
         moviesById.put(movieId, movie);
@@ -31,7 +33,7 @@ public class MovieController {
 
     @PutMapping(value = "/{movieId}", consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(NO_CONTENT)
-    public void update(@RequestBody Movie movie, @PathVariable Integer movieId) {
+    public void update(@Validated @RequestBody Movie movie, @PathVariable Integer movieId) {
         moviesById.put(movie.getId(), movie);
         log.info("Фильм с ID {} обновлён", movieId);
     }

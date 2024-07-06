@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+import ru.yandex.practicum.filmorate.validation.InThePast;
+
 import java.time.LocalDate;
 
 
@@ -19,6 +21,7 @@ public class User {
 
     private String name;
 
+    @InThePast
     private LocalDate birthDate;
 
     public String getName() {

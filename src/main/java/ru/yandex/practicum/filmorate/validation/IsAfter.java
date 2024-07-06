@@ -1,18 +1,20 @@
 package ru.yandex.practicum.filmorate.validation;
 
 import jakarta.validation.Constraint;
-import java.lang.annotation.ElementType;
+import jakarta.validation.Payload;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 
 @Constraint(validatedBy= IsAfterValidator.class)
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
+@Target({FIELD, METHOD})
+@Retention(RUNTIME)
 public @interface IsAfter {
     String value();
-    String message() default "Дата должна быть позже {value}";
-    // Class<?>[] groups() default {}; //TODO ???
-    // Class<? extends Payload>[] payload() default {}; //TODO ???
+    String message() default "дата должна быть позже {value}";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default {};
 }
