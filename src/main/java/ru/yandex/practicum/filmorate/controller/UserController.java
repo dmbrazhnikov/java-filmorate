@@ -14,7 +14,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/user", produces = APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/users", produces = APPLICATION_JSON_VALUE)
 public class UserController {
 
     private static final Map<Integer, User> usersById = new ConcurrentHashMap<>();
@@ -39,7 +39,7 @@ public class UserController {
         return user;
     }
 
-    @GetMapping("/all")
+    @GetMapping()
     public List<User> getAll() {
         return usersById.values().stream().toList();
     }

@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class UserRestAssuredClient extends BaseRestAssuredClient {
 
     public UserRestAssuredClient() {
-        super("/user");
+        super("/users");
     }
 
     public Response sendPostRequest(User user) {
@@ -34,7 +34,7 @@ public class UserRestAssuredClient extends BaseRestAssuredClient {
             response = given()
                     .config(config)
                     .accept(JSON)
-                    .get(urlPrefix + "/all");
+                    .get(urlPrefix);
         } catch (Exception e) {
             fail("Exception occurred: " + e.getClass() + " " + e.getMessage());
         }

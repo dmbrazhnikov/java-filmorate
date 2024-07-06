@@ -14,7 +14,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/movie", produces = APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/films", produces = APPLICATION_JSON_VALUE)
 public class MovieController {
 
     private static final Map<Integer, Movie> moviesById = new ConcurrentHashMap<>();
@@ -39,7 +39,7 @@ public class MovieController {
         return movie;
     }
 
-    @GetMapping("/all")
+    @GetMapping()
     public List<Movie> getAll() {
         return moviesById.values().stream().toList();
     }

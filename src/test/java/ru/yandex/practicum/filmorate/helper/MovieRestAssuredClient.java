@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class MovieRestAssuredClient extends BaseRestAssuredClient {
 
     public MovieRestAssuredClient() {
-        super("/movie");
+        super("/films");
     }
 
     public Response sendPostRequest(Movie movie) {
@@ -34,7 +34,7 @@ public class MovieRestAssuredClient extends BaseRestAssuredClient {
             response = given()
                     .config(config)
                     .accept(JSON)
-                    .get(urlPrefix + "/all");
+                    .get(urlPrefix);
         } catch (Exception e) {
             fail("Exception occurred: " + e.getClass() + " " + e.getMessage());
         }
