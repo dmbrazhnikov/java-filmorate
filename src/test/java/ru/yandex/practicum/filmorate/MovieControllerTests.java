@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate;
 
 import io.restassured.RestAssured;
-import io.restassured.response.Response;
-import io.restassured.response.ResponseBody;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +9,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import ru.yandex.practicum.filmorate.helper.MovieRestAssuredClient;
 import ru.yandex.practicum.filmorate.model.Movie;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -25,28 +24,31 @@ import static org.springframework.http.HttpStatus.*;
 
 @DisplayName("Фильм")
 @SpringBootTest(classes = FilmorateApplication.class, webEnvironment = RANDOM_PORT)
-class FilmorateMovieControllerTests {
+class MovieControllerTests {
 
-	private static final MovieRestClient movieRestClient = new MovieRestClient();
-	private static final Movie refMovie = Movie.builder()
-			.name("Молчание ягнят")
-			.duration(Duration.ofMinutes(118))
-			.description("Хороший, годный фильм")
-			.releaseDate(LocalDate.of(1991, 2, 14))
-			.build();
+	private static final MovieRestAssuredClient movieClient = new MovieRestAssuredClient();
+	private static Movie refMovie;
 
 	@LocalServerPort
 	int port;
 
 	@BeforeEach
-	void before() {
+	void beforeEach() {
 		RestAssured.port = port;
+		refMovie = Movie.builder()
+				.name("Молчание ягнят")
+				.duration(Duration.ofMinutes(118))
+				.description("Хороший, годный фильм")
+				.releaseDate(LocalDate.of(1991, 2, 14))
+				.build();
 	}
+
+	/* Некоторые проверки преднамеренно упрощены (неполны) для ускорения разработки */
 
 	@Test
 	@DisplayName("Добавление с корректными атрибутами")
 	void addValid() {
-		movieRestClient.sendCreateMovieRequest(refMovie)
+		movieClient.sendPostRequest(refMovie)
 				.then()
 				.statusCode(CREATED.value())
 				.and()
@@ -57,7 +59,7 @@ class FilmorateMovieControllerTests {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource({"provideMoviesWithSingleNonValidAttribute"})
 	void badRequest(Movie movie, String errorMessage) {
-		movieRestClient.sendCreateMovieRequest(movie)
+		movieClient.sendPostRequest(movie)
 				.then()
 				.statusCode(BAD_REQUEST.value())
 				.and()
@@ -73,8 +75,8 @@ class FilmorateMovieControllerTests {
 				.description("Лучшая роль Бенисио Дель Торо!")
 				.releaseDate(LocalDate.of(2007, 10, 19))
 				.build();
-		movieRestClient.sendCreateMovieRequest(anotherMovie);
-		movieRestClient.sendGetAllMoviesRequest()
+		movieClient.sendPostRequest(anotherMovie);
+		movieClient.sendGetAllRequest()
 				.then()
 				.statusCode(OK.value())
 				.and()
@@ -84,11 +86,17 @@ class FilmorateMovieControllerTests {
 	@DisplayName("Обновление")
 	@Test
 	void update() {
-		int movieId = movieRestClient.sendCreateMovieRequest(refMovie).path("id");
-		Movie updatedMovie = refMovie.toBuilder().id(movieId).description("Джоди Фостер необычайно хороша!").build();
-		movieRestClient.sendPutMovieRequest(updatedMovie)
+		int movieId = movieClient.sendPostRequest(refMovie).path("id");
+		String newDesc = "Джоди Фостер необычайно хороша!";
+		Movie updatedMovie = refMovie.toBuilder()
+				.id(movieId)
+				.description(newDesc)
+				.build();
+		movieClient.sendPutRequest(updatedMovie)
 				.then()
-				.statusCode(NO_CONTENT.value());
+				.statusCode(OK.value())
+				.and()
+				.assertThat().body("description", equalTo(newDesc));
 	}
 
 	private static Stream<Arguments> provideMoviesWithSingleNonValidAttribute() {

@@ -1,15 +1,19 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.helper;
 
 import io.restassured.response.Response;
 import ru.yandex.practicum.filmorate.model.Movie;
 import static io.restassured.RestAssured.given;
-import static io.restassured.http.ContentType.*;
+import static io.restassured.http.ContentType.JSON;
 import static org.junit.jupiter.api.Assertions.fail;
 
 
-public class MovieRestClient extends BaseRestClient {
+public class MovieRestAssuredClient extends BaseRestAssuredClient {
 
-    public Response sendCreateMovieRequest(Movie movie) {
+    public MovieRestAssuredClient() {
+        super("/movie");
+    }
+
+    public Response sendPostRequest(Movie movie) {
         Response response = null;
         try {
             response = given()
@@ -17,34 +21,34 @@ public class MovieRestClient extends BaseRestClient {
                     .contentType(JSON)
                     .accept(JSON)
                     .body(movie)
-                    .post("/movie");
+                    .post(URL_PREFIX);
         } catch (Exception e) {
             fail("Exception occurred: " + e.getClass() + " " + e.getMessage());
         }
         return response;
     }
 
-    public Response sendGetAllMoviesRequest() {
+    public Response sendGetAllRequest() {
         Response response = null;
         try {
             response = given()
                     .config(config)
                     .accept(JSON)
-                    .get("/movie/all");
+                    .get(URL_PREFIX + "/all");
         } catch (Exception e) {
             fail("Exception occurred: " + e.getClass() + " " + e.getMessage());
         }
         return response;
     }
 
-    public Response sendPutMovieRequest(Movie movie) {
+    public Response sendPutRequest(Movie movie) {
         Response response = null;
         try {
             response = given()
                     .config(config)
                     .contentType(JSON)
                     .body(movie)
-                    .put("/movie/" + movie.getId());
+                    .put(URL_PREFIX + "/" + movie.getId());
         } catch (Exception e) {
             fail("Exception occurred: " + e.getClass() + " " + e.getMessage());
         }

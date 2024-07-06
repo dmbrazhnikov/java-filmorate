@@ -32,10 +32,11 @@ public class MovieController {
     }
 
     @PutMapping(value = "/{movieId}", consumes = APPLICATION_JSON_VALUE)
-    @ResponseStatus(NO_CONTENT)
-    public void update(@Validated @RequestBody Movie movie, @PathVariable Integer movieId) {
+    public Movie update(@Validated @RequestBody Movie movie, @PathVariable Integer movieId) {
         moviesById.put(movie.getId(), movie);
         log.info("Фильм с ID {} обновлён", movieId);
+        log.debug(movie.toString());
+        return movie;
     }
 
     @GetMapping("/all")

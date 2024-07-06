@@ -1,14 +1,15 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.helper;
 
 import io.restassured.config.HttpClientConfig;
 import io.restassured.config.RestAssuredConfig;
 
+public abstract class BaseRestAssuredClient {
 
-public class BaseRestClient {
-
+    protected final String URL_PREFIX;
     protected static RestAssuredConfig config;
 
-    public BaseRestClient() {
+    public BaseRestAssuredClient(String urlPrefix) {
+        URL_PREFIX = urlPrefix;
         config = RestAssuredConfig.config()
                 .httpClient(HttpClientConfig.httpClientConfig()
                         .setParam("http.socket.timeout", 10000)

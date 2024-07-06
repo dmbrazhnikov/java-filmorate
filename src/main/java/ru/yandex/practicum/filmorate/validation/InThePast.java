@@ -13,7 +13,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({FIELD, METHOD})
 @Retention(RUNTIME)
 public @interface InThePast {
-    String message() default "Дата должна быть в прошлом";
+    String message() default "дата должна быть в прошлом";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

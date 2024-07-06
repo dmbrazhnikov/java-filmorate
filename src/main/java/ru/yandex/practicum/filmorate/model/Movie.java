@@ -2,7 +2,8 @@ package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.Data;
+import lombok.Builder;
 import org.hibernate.validator.constraints.time.DurationMin;
 import ru.yandex.practicum.filmorate.validation.IsAfter;
 import java.time.Duration;
@@ -24,6 +25,7 @@ public class Movie {
     @IsAfter("1895-12-28")
     private LocalDate releaseDate;
 
+    // Считаем всё короче получаса короткометражками и не принимаем для рейтинга
     @DurationMin(minutes = 30, message = "длительность должна превышать {minutes} минут")
     private Duration duration;
 }
