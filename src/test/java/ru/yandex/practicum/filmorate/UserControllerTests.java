@@ -39,7 +39,7 @@ public class UserControllerTests {
                 .login("user1")
                 .name("Тестовый пользователь 1")
                 .email("user1@server.com")
-                .birthDate(LocalDate.of(1990, 5, 7))
+                .birthday(LocalDate.of(1990, 5, 7))
                 .build();
     }
 
@@ -73,7 +73,7 @@ public class UserControllerTests {
                 .login("user2")
                 .name("Тестовый пользователь 2")
                 .email("user2@server.com")
-                .birthDate(LocalDate.of(1982, 11, 19))
+                .birthday(LocalDate.of(1982, 11, 19))
                 .build();
         userClient.sendPostRequest(anotherUser);
         userClient.sendGetAllRequest()
@@ -114,7 +114,7 @@ public class UserControllerTests {
                 arguments(named("Невалидный адрес эл. почты",
                                 refUser.toBuilder().email("user123*.server.com").build()),
                         "некорректный адрес электронной почты"),
-                arguments(named("Дата рождения - сегодня", refUser.toBuilder().birthDate(LocalDate.now()).build()),
+                arguments(named("Дата рождения - сегодня", refUser.toBuilder().birthday(LocalDate.now()).build()),
                         "дата рождения должна быть в прошлом")
         );
     }

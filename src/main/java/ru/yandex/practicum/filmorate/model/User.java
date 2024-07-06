@@ -31,7 +31,7 @@ public class User {
     private String email;
 
     @InThePast(message = "дата рождения должна быть в прошлом")
-    private LocalDate birthDate;
+    private LocalDate birthday;
 
     public String getName() {
         return name == null || name.isEmpty() || name.isBlank() ? login : name;
