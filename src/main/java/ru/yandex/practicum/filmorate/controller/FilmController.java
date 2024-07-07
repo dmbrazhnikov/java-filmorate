@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.Movie;
+import ru.yandex.practicum.filmorate.model.Film;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,33 +15,33 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 @RestController
 @RequestMapping(value = "/films", produces = APPLICATION_JSON_VALUE)
-public class MovieController {
+public class FilmController {
 
-    private static final Map<Integer, Movie> moviesById = new ConcurrentHashMap<>();
+    private static final Map<Integer, Film> moviesById = new ConcurrentHashMap<>();
     private static final AtomicInteger idSequence = new AtomicInteger();
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
-    public Movie add(@Validated @RequestBody Movie movie) {
+    public Film add(@Validated @RequestBody Film film) {
         int movieId = idSequence.getAndIncrement();
-        movie.setId(movieId);
-        moviesById.put(movieId, movie);
+        film.setId(movieId);
+        moviesById.put(movieId, film);
         log.info("Фильм с ID {} добавлен", movieId);
-        log.debug(movie.toString());
-        return movie;
+        log.debug(film.toString());
+        return film;
     }
 
     @PutMapping(consumes = APPLICATION_JSON_VALUE)
-    public Movie update(@Validated @RequestBody Movie movie) {
-        Integer movieId = movie.getId();
-        moviesById.put(movieId, movie);
+    public Film update(@Validated @RequestBody Film film) {
+        Integer movieId = film.getId();
+        moviesById.put(movieId, film);
         log.info("Фильм с ID {} обновлён", movieId);
-        log.debug(movie.toString());
-        return movie;
+        log.debug(film.toString());
+        return film;
     }
 
     @GetMapping()
-    public List<Movie> getAll() {
+    public List<Film> getAll() {
         return moviesById.values().stream().toList();
     }
 }
