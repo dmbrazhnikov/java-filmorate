@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -26,6 +27,7 @@ public class Movie {
     private LocalDate releaseDate;
 
     // Считаем всё короче получаса короткометражками и не принимаем для рейтинга
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     @DurationMin(minutes = 30, message = "длительность должна превышать {minutes} минут")
     private Duration duration;
 }

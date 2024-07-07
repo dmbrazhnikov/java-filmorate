@@ -31,8 +31,9 @@ public class UserController {
         return user;
     }
 
-    @PutMapping(value = "/{userId}", consumes = APPLICATION_JSON_VALUE)
-    public User update(@Validated @RequestBody User user, @PathVariable Integer userId) {
+    @PutMapping(consumes = APPLICATION_JSON_VALUE)
+    public User update(@Validated @RequestBody User user) {
+        Integer userId = user.getId();
         usersById.put(userId, user);
         log.info("Пользователь с ID {} обновлён", userId);
         log.debug(user.toString());
