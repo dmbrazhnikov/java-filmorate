@@ -48,7 +48,7 @@ public class UserRestAssuredClient extends BaseRestAssuredClient {
                     .config(config)
                     .contentType(JSON)
                     .body(user)
-                    .put(urlPrefix + "/" + user.getId());
+                    .put(urlPrefix);
         } catch (Exception e) {
             fail("Exception occurred: " + e.getClass() + " " + e.getMessage());
         }
