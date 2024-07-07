@@ -18,7 +18,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class FilmController {
 
     private static final Map<Integer, Film> moviesById = new ConcurrentHashMap<>();
-    private static final AtomicInteger idSequence = new AtomicInteger();
+    private static final AtomicInteger idSequence = new AtomicInteger(1);
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
