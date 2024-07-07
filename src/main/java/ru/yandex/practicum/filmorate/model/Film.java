@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
@@ -27,5 +28,6 @@ public class Film {
     // Считаем всё короче получаса короткометражками и не принимаем для рейтинга
 //    @DurationMin(minutes = 30, message = "длительность должна превышать {minutes} минут")
 //    private Duration duration;
+    @Positive
     private int duration; // FIXME подгонка под кривые тесты пайпа
 }
