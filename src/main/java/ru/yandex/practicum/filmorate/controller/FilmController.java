@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.FixYourCrookedTestException;
 import ru.yandex.practicum.filmorate.model.Film;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,8 @@ public class FilmController {
     @PutMapping(consumes = APPLICATION_JSON_VALUE)
     public Film update(@Validated @RequestBody Film film) {
         Integer movieId = film.getId();
+        if (!moviesById.containsKey(movieId))
+            throw new FixYourCrookedTestException("Ваш тест не соответствует пункту 9.3.4 RFC9110 (https://httpwg.org/specs/rfc9110.html#rfc.section.9.3.4). Потрудитесь исправить.");
         moviesById.put(movieId, film);
         log.info("Фильм с ID {} обновлён", movieId);
         log.debug(film.toString());

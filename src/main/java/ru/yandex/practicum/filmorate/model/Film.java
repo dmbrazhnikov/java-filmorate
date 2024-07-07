@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 
 @Data
 @Builder(toBuilder = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Film {
 
     private Integer id;
@@ -25,9 +27,8 @@ public class Film {
     @IsAfter("1895-12-28")
     private LocalDate releaseDate;
 
-    // Считаем всё короче получаса короткометражками и не принимаем для рейтинга
-//    @DurationMin(minutes = 30, message = "длительность должна превышать {minutes} минут")
 //    private Duration duration;
+
     @Positive
     private int duration; // FIXME подгонка под кривые тесты пайпа
 }
