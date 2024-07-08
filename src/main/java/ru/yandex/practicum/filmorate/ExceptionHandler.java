@@ -5,7 +5,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.yandex.practicum.filmorate.validation.ErrorDTO;
@@ -14,9 +13,9 @@ import java.util.List;
 
 
 @ControllerAdvice
-public class ExceptionTranslator {
+public class ExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorDTO processValidationError(MethodArgumentNotValidException ex) {
@@ -27,7 +26,7 @@ public class ExceptionTranslator {
         return error;
     }
 
-    @ExceptionHandler(FixYourCrookedTestException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(FixYourCrookedTestException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
     public ErrorDTO processCrookedTestException(FixYourCrookedTestException ex) {
