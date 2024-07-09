@@ -9,12 +9,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import ru.yandex.practicum.filmorate.helper.UserRestAssuredClient;
 import ru.yandex.practicum.filmorate.model.User;
-
 import java.time.LocalDate;
 import java.util.stream.Stream;
-
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -26,7 +23,7 @@ import static org.springframework.http.HttpStatus.*;
 @SpringBootTest(classes = FilmorateApplication.class, webEnvironment = RANDOM_PORT)
 public class UserControllerTests {
 
-    private static final UserRestAssuredClient userClient = new UserRestAssuredClient();
+    private static final RestAssuredClient userClient = new RestAssuredClient("/users");
     private static User refUser;
 
     @LocalServerPort

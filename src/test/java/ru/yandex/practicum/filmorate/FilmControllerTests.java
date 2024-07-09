@@ -9,7 +9,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import ru.yandex.practicum.filmorate.helper.FilmRestAssuredClient;
 import ru.yandex.practicum.filmorate.model.Film;
 import java.time.LocalDate;
 import java.util.stream.Stream;
@@ -24,7 +23,7 @@ import static org.springframework.http.HttpStatus.*;
 @SpringBootTest(classes = FilmorateApplication.class, webEnvironment = RANDOM_PORT)
 class FilmControllerTests {
 
-	private static final FilmRestAssuredClient movieClient = new FilmRestAssuredClient();
+	private static final RestAssuredClient filmClient = new RestAssuredClient("/films");
 	private static Film refFilm;
 
 	@LocalServerPort
@@ -47,7 +46,7 @@ class FilmControllerTests {
 	@Test
 	@DisplayName("Добавление с корректными атрибутами")
 	void addValid() {
-		movieClient.sendPostRequest(refFilm)
+		filmClient.sendPostRequest(refFilm)
 				.then()
 				.statusCode(CREATED.value())
 				.and()
@@ -58,7 +57,7 @@ class FilmControllerTests {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource({"provideMoviesWithSingleNonValidAttribute"})
 	void badRequest(Film film, String errorMessage) {
-		movieClient.sendPostRequest(film)
+		filmClient.sendPostRequest(film)
 				.then()
 				.statusCode(BAD_REQUEST.value())
 				.and()
@@ -75,8 +74,8 @@ class FilmControllerTests {
 				.description("Лучшая роль Бенисио Дель Торо!")
 				.releaseDate(LocalDate.of(2007, 10, 19))
 				.build();
-		movieClient.sendPostRequest(anotherFilm);
-		movieClient.sendGetAllRequest()
+		filmClient.sendPostRequest(anotherFilm);
+		filmClient.sendGetAllRequest()
 				.then()
 				.statusCode(OK.value())
 				.and()
@@ -86,13 +85,13 @@ class FilmControllerTests {
 	@DisplayName("Обновление")
 	@Test
 	void update() {
-		int movieId = movieClient.sendPostRequest(refFilm).path("id");
+		int movieId = filmClient.sendPostRequest(refFilm).path("id");
 		String newDesc = "Джоди Фостер необычайно хороша!";
 		Film updatedFilm = refFilm.toBuilder()
 				.id(movieId)
 				.description(newDesc)
 				.build();
-		movieClient.sendPutRequest(updatedFilm)
+		filmClient.sendPutRequest(updatedFilm)
 				.then()
 				.statusCode(OK.value())
 				.and()

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.helper;
+package ru.yandex.practicum.filmorate;
 
 import io.restassured.config.HttpClientConfig;
 import io.restassured.config.RestAssuredConfig;
@@ -8,12 +8,12 @@ import static io.restassured.http.ContentType.JSON;
 import static org.junit.jupiter.api.Assertions.fail;
 
 
-public abstract class BaseRestAssuredClient {
+public class RestAssuredClient {
 
     protected final String urlPrefix;
     protected static RestAssuredConfig config;
 
-    public BaseRestAssuredClient(String urlPrefix) {
+    public RestAssuredClient(String urlPrefix) {
         this.urlPrefix = urlPrefix;
         config = RestAssuredConfig.config()
                 .httpClient(HttpClientConfig.httpClientConfig()

@@ -29,5 +29,5 @@ public class Film {
 //    private Duration duration;
 
     @Positive
-    private int duration; // FIXME подгонка под кривые тесты пайпа
+    private Integer duration; // FIXME подгонка под кривые тесты пайпа
 }
