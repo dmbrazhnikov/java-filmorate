@@ -22,7 +22,7 @@ public class ExceptionTranslator {
         return error;
     }
 
-    @org.springframework.web.bind.annotation.ExceptionHandler(FixYourCrookedTestException.class)
+    @ExceptionHandler(FixYourCrookedTestException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorDTO processCrookedTestException(FixYourCrookedTestException ex) {
         return ErrorDTO.builder()
