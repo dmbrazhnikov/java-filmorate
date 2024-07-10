@@ -5,8 +5,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.FixYourCrookedTestException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.AttributeValueException;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
