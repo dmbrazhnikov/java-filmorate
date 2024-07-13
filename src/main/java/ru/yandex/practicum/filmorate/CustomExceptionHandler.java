@@ -10,7 +10,7 @@ import java.util.List;
 
 
 @RestControllerAdvice
-public class ExceptionTranslator {
+public class CustomExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -20,14 +20,5 @@ public class ExceptionTranslator {
         ErrorDTO error = new ErrorDTO("ошибка валидации");
         fieldErrors.forEach(fieldError -> error.add(fieldError.getObjectName(), fieldError.getField(), fieldError.getDefaultMessage()));
         return error;
-    }
-
-    @ExceptionHandler(FixYourCrookedTestException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorDTO processCrookedTestException(FixYourCrookedTestException ex) {
-        return ErrorDTO.builder()
-                .message("ошибка теста")
-                .description(ex.getMessage())
-                .build();
     }
 }
