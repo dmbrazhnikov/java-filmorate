@@ -1,11 +1,11 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.test;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.validation.ErrorDTO;
+import ru.yandex.practicum.filmorate.test.validation.ErrorDTO;
 import java.util.List;
 
 

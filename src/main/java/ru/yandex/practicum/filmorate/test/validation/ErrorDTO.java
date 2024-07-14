@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.validation;
+package ru.yandex.practicum.filmorate.test.validation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

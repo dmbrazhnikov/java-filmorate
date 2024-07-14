@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.test.e2e;
 
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +9,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.test.FilmorateApplication;
+import ru.yandex.practicum.filmorate.test.model.Film;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 import static org.hamcrest.Matchers.*;
@@ -32,13 +33,7 @@ class FilmControllerTests {
 	@BeforeEach
 	void beforeEach() {
 		RestAssured.port = port;
-		refFilm = Film.builder()
-				.name("Молчание ягнят")
-				//.duration(Duration.ofMinutes(118)) // FIXME подгонка под кривые тесты пайпа
-				.duration(118)
-				.description("Хороший, годный фильм")
-				.releaseDate(LocalDate.of(1991, 2, 14))
-				.build();
+		refFilm = getRefFilm();
 	}
 
 	/* Некоторые проверки преднамеренно упрощены (неполны) для ускорения разработки */
@@ -55,7 +50,7 @@ class FilmControllerTests {
 
 	@DisplayName("Добавление с одним некорректным атрибутом")
 	@ParameterizedTest(name = "{0}")
-	@MethodSource({"provideMoviesWithSingleNonValidAttribute"})
+	@MethodSource("provideMoviesWithSingleNonValidAttribute")
 	void badRequest(Film film, String errorMessage) {
 		filmClient.sendPostRequest(film)
 				.then()
@@ -69,7 +64,6 @@ class FilmControllerTests {
 	void getAllMovies() {
 		Film anotherFilm = Film.builder()
 				.name("Things we lost in the fire")
-				//.duration(Duration.ofMinutes(118)) // FIXME подгонка под кривые тесты пайпа
 				.duration(118)
 				.description("Лучшая роль Бенисио Дель Торо!")
 				.releaseDate(LocalDate.of(2007, 10, 19))
@@ -99,6 +93,7 @@ class FilmControllerTests {
 	}
 
 	private static Stream<Arguments> provideMoviesWithSingleNonValidAttribute() {
+		refFilm = getRefFilm();
 		return Stream.of(
 				arguments(named("Название null", refFilm.toBuilder().name(null).build()),
 						"название не может быть пустым"),
@@ -115,5 +110,14 @@ class FilmControllerTests {
 										.build()),
 						"дата должна быть позже 1895-12-28")
 		);
+	}
+
+	private static Film getRefFilm() {
+		return Film.builder()
+				.name("Молчание ягнят")
+				.description("111")
+				.duration(118)
+				.releaseDate(LocalDate.of(1991, 2, 14))
+				.build();
 	}
 }

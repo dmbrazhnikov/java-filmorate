@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.test.e2e;
 
 import io.restassured.config.HttpClientConfig;
 import io.restassured.config.RestAssuredConfig;

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.test.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotEmpty;
@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.validation.IsAfter;
+import ru.yandex.practicum.filmorate.test.validation.IsAfter;
 import java.time.LocalDate;
 
 
@@ -25,8 +25,6 @@ public class Film {
 
     @IsAfter("1895-12-28")
     private LocalDate releaseDate;
-
-//    private Duration duration;
 
     @Positive
     private Integer duration; // FIXME подгонка под кривые тесты пайпа

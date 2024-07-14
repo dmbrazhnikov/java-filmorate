@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.test.e2e;
 
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +9,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.test.FilmorateApplication;
+import ru.yandex.practicum.filmorate.test.model.User;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 import static org.hamcrest.Matchers.*;
@@ -32,12 +33,7 @@ public class UserControllerTests {
     @BeforeEach
     void beforeEach() {
         RestAssured.port = port;
-        refUser = User.builder()
-                .login("user1")
-                .name("Тестовый пользователь 1")
-                .email("user1@server.com")
-                .birthday(LocalDate.of(1990, 5, 7))
-                .build();
+        refUser = getRefUser();
     }
 
     /* Некоторые проверки преднамеренно упрощены (неполны) для ускорения разработки */
@@ -97,6 +93,7 @@ public class UserControllerTests {
     }
 
     private static Stream<Arguments> provideUsersWithSingleNonValidAttribute() {
+        refUser = getRefUser();
         return Stream.of(
                 arguments(named("Логин null", refUser.toBuilder().login(null).build()),
                         "логин не может быть пустым"),
@@ -114,5 +111,14 @@ public class UserControllerTests {
                 arguments(named("Дата рождения - сегодня", refUser.toBuilder().birthday(LocalDate.now()).build()),
                         "дата рождения должна быть в прошлом")
         );
+    }
+
+    private static User getRefUser() {
+        return User.builder()
+                .login("user1")
+                .name("Тестовый пользователь 1")
+                .email("user1@server.com")
+                .birthday(LocalDate.of(1990, 5, 7))
+                .build();
     }
 }
