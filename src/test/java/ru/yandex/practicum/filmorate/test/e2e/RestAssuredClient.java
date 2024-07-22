@@ -50,13 +50,13 @@ public class RestAssuredClient {
         return response;
     }
 
-    public Response sendGetAllRequest() {
+    public Response sendGet(String uriSuffix) {
         Response response = null;
         try {
             response = given()
                     .config(config)
                     .accept(JSON)
-                    .get(urlPrefix);
+                    .get(urlPrefix + uriSuffix);
         } catch (Exception e) {
             fail("Exception occurred: " + e.getClass() + " " + e.getMessage());
         }

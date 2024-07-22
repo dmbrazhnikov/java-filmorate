@@ -13,6 +13,8 @@ import ru.yandex.practicum.filmorate.test.FilmorateApplication;
 import ru.yandex.practicum.filmorate.test.model.Film;
 import java.time.LocalDate;
 import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -69,7 +71,7 @@ class FilmControllerTests {
 				.releaseDate(LocalDate.of(2007, 10, 19))
 				.build();
 		filmClient.sendPostRequest(anotherFilm);
-		filmClient.sendGetAllRequest()
+		filmClient.sendGet("")
 				.then()
 				.statusCode(OK.value())
 				.and()
@@ -79,10 +81,10 @@ class FilmControllerTests {
 	@DisplayName("Обновление")
 	@Test
 	void update() {
-		int movieId = filmClient.sendPostRequest(refFilm).path("id");
+		int filmId = filmClient.sendPostRequest(refFilm).path("id");
 		String newDesc = "Джоди Фостер необычайно хороша!";
 		Film updatedFilm = refFilm.toBuilder()
-				.id(movieId)
+				.id(filmId)
 				.description(newDesc)
 				.build();
 		filmClient.sendPutRequest(updatedFilm)
@@ -90,6 +92,27 @@ class FilmControllerTests {
 				.statusCode(OK.value())
 				.and()
 				.assertThat().body("description", equalTo(newDesc));
+	}
+
+	@DisplayName("Получение по ID существующего")
+	@Test
+	void getExistingById() {
+		int filmId = filmClient.sendPostRequest(refFilm).path("id");
+		refFilm.setId(filmId);
+		Film result = filmClient.sendGet("/" + filmId)
+				.then()
+				.statusCode(OK.value())
+				.extract()
+				.as(Film.class);
+		assertThat(result).isEqualTo(refFilm);
+	}
+
+	@DisplayName("Получение по ID несуществующего")
+	@Test
+	void getNonExistingById() {
+		filmClient.sendGet("/" + 9999)
+				.then()
+				.statusCode(NOT_FOUND.value());
 	}
 
 	private static Stream<Arguments> provideMoviesWithSingleNonValidAttribute() {

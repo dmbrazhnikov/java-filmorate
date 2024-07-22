@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.test.NotFoundException;
 import ru.yandex.practicum.filmorate.test.model.User;
 import ru.yandex.practicum.filmorate.test.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.test.storage.Storage;
@@ -69,5 +70,13 @@ public class UserController {
     public List<User> getAll() {
         log.debug("Получен запрос получения списка всех пользователей");
         return storage.getAll();
+    }
+
+    @GetMapping("/{userId}")
+    public User get(@PathVariable Integer userId) {
+        log.debug("Получен запрос данных попользователя с ID {}", userId);
+        return Optional.ofNullable(storage.get(userId)).orElseThrow(
+                () -> new NotFoundException("Фильм с ID " + userId + " не найден")
+        );
     }
 }

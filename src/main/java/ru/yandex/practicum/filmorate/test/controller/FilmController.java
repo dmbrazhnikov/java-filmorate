@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.test.NotFoundException;
 import ru.yandex.practicum.filmorate.test.model.Film;
 import ru.yandex.practicum.filmorate.test.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.test.storage.Storage;
@@ -71,5 +72,13 @@ public class FilmController {
     public List<Film> getAll() {
         log.debug("Получен запрос получения списка всех фильмов");
         return storage.getAll();
+    }
+
+    @GetMapping("/{filmId}")
+    public Film get(@PathVariable Integer filmId) {
+        log.debug("Получен запрос данных фильма с ID {}", filmId);
+        return Optional.ofNullable(storage.get(filmId)).orElseThrow(
+                () -> new NotFoundException("Фильм с ID " + filmId + " не найден")
+        );
     }
 }

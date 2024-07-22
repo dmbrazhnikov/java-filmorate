@@ -10,9 +10,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import ru.yandex.practicum.filmorate.test.FilmorateApplication;
+import ru.yandex.practicum.filmorate.test.model.Film;
 import ru.yandex.practicum.filmorate.test.model.User;
 import java.time.LocalDate;
 import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -69,7 +72,7 @@ public class UserControllerTests {
                 .birthday(LocalDate.of(1982, 11, 19))
                 .build();
         userClient.sendPostRequest(anotherUser);
-        userClient.sendGetAllRequest()
+        userClient.sendGet("")
                 .then()
                 .statusCode(OK.value())
                 .and()
@@ -90,6 +93,27 @@ public class UserControllerTests {
                 .statusCode(OK.value())
                 .and()
                 .assertThat().body("name", equalTo(newName));
+    }
+
+    @DisplayName("Получение по ID существующего")
+    @Test
+    void getExistingById() {
+        int userId = userClient.sendPostRequest(refUser).path("id");
+        refUser.setId(userId);
+        User result = userClient.sendGet("/" + userId)
+                .then()
+                .statusCode(OK.value())
+                .extract()
+                .as(User.class);
+        assertThat(result).isEqualTo(refUser);
+    }
+
+    @DisplayName("Получение по ID несуществующего")
+    @Test
+    void getNonExistingById() {
+        userClient.sendGet("/" + 9999)
+                .then()
+                .statusCode(NOT_FOUND.value());
     }
 
     private static Stream<Arguments> provideUsersWithSingleNonValidAttribute() {
