@@ -1,22 +1,21 @@
-package ru.yandex.practicum.filmorate.test.e2e;
+package ru.yandex.practicum.filmorate.e2e;
 
 import io.restassured.RestAssured;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import ru.yandex.practicum.filmorate.test.FilmorateApplication;
-import ru.yandex.practicum.filmorate.test.model.Film;
-import ru.yandex.practicum.filmorate.test.model.User;
+import ru.yandex.practicum.filmorate.FilmorateApplication;
+import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -114,6 +113,46 @@ public class UserControllerTests {
         userClient.sendGet("/" + 9999)
                 .then()
                 .statusCode(NOT_FOUND.value());
+    }
+
+    @Nested
+    @DisplayName("Друзья")
+    class FriendshipTests {
+
+        private User user1, user2;
+
+        @BeforeEach
+        void beforeEach() {
+            user1 = getRefUser();
+            user2 = User.builder()
+                    .login("user2")
+                    .name("Тестовый пользователь 2")
+                    .email("user2@server.com")
+                    .birthday(LocalDate.of(1988, 7, 17))
+                    .build();
+        }
+
+        @Test
+        @DisplayName("Существующие пользователи")
+        void setFriendshipForExisting() {
+            int user1Id = userClient.sendPostRequest(user1).path("id"),
+                    user2Id = userClient.sendPostRequest(user2).path("id");
+            userClient.sendPutRequest(String.format("/%d/friends/%d", user1Id, user2Id))
+                    .then()
+                    .statusCode(NO_CONTENT.value());
+            User actualUser1 = userClient.sendGet("/" + user1Id)
+                    .then()
+                    .extract()
+                    .as(User.class);
+            User actualUser2 = userClient.sendGet("/" + user2Id)
+                    .then()
+                    .extract()
+                    .as(User.class);
+            assertAll(
+                    () -> assertTrue(actualUser1.getFriends().contains(user2Id)),
+                    () -> assertTrue(actualUser2.getFriends().contains(user1Id))
+            );
+        }
     }
 
     private static Stream<Arguments> provideUsersWithSingleNonValidAttribute() {

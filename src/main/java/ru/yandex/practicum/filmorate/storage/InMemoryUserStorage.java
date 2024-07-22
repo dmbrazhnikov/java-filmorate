@@ -1,7 +1,7 @@
-package ru.yandex.practicum.filmorate.test.storage;
+package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.test.model.User;
+import ru.yandex.practicum.filmorate.model.User;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

@@ -1,11 +1,11 @@
-package ru.yandex.practicum.filmorate.test.unit.validation;
+package ru.yandex.practicum.filmorate.unit.validation;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import ru.yandex.practicum.filmorate.test.model.User;
+import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 

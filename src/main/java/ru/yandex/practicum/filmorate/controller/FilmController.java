@@ -1,14 +1,14 @@
-package ru.yandex.practicum.filmorate.test.controller;
+package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.test.NotFoundException;
-import ru.yandex.practicum.filmorate.test.model.Film;
-import ru.yandex.practicum.filmorate.test.storage.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.test.storage.Storage;
+import ru.yandex.practicum.filmorate.NotFoundException;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.Storage;
+import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
 import java.util.Optional;

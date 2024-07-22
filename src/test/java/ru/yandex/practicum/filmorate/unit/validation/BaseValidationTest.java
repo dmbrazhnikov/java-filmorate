@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.test.unit.validation;
+package ru.yandex.practicum.filmorate.unit.validation;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;

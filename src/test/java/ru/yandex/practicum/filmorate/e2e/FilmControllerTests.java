@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.test.e2e;
+package ru.yandex.practicum.filmorate.e2e;
 
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,8 +9,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import ru.yandex.practicum.filmorate.test.FilmorateApplication;
-import ru.yandex.practicum.filmorate.test.model.Film;
+import ru.yandex.practicum.filmorate.FilmorateApplication;
+import ru.yandex.practicum.filmorate.model.Film;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 
@@ -87,7 +87,7 @@ class FilmControllerTests {
 				.id(filmId)
 				.description(newDesc)
 				.build();
-		filmClient.sendPutRequest(updatedFilm)
+		filmClient.sendPutRequest("", updatedFilm)
 				.then()
 				.statusCode(OK.value())
 				.and()

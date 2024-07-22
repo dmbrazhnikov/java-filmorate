@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.test.unit.validation;
+package ru.yandex.practicum.filmorate.unit.validation;
 
 import jakarta.validation.ConstraintViolation;
 import org.junit.jupiter.api.DisplayName;
@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import ru.yandex.practicum.filmorate.test.model.Film;
+import ru.yandex.practicum.filmorate.model.Film;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -36,7 +36,7 @@ public class ValidateFilmTests extends BaseValidationTest {
 
     @Nested
     @DisplayName("Описание")
-    class Description {
+    class DescriptionTests {
 
         @ParameterizedTest(name = "{0}")
         @DisplayName("Корректное")
@@ -70,7 +70,7 @@ public class ValidateFilmTests extends BaseValidationTest {
 
     @Nested
     @DisplayName("Дата релиза")
-    class ReleaseDate {
+    class ReleaseDateTests {
 
         @Test
         @DisplayName("Самая ранняя из разрешённых")
@@ -94,7 +94,7 @@ public class ValidateFilmTests extends BaseValidationTest {
 
     @Nested
     @DisplayName("Длительность")
-    class Duration {
+    class DurationTests {
 
         @Test
         @DisplayName("Минимальная корректная")

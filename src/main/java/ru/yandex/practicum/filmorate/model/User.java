@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.test.model;
+package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.Email;
@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Data
@@ -29,6 +31,8 @@ public class User {
 
     @Past(message = "дата рождения должна быть в прошлом")
     private LocalDate birthday;
+
+    private final Set<Integer> friends = new HashSet<>();
 
     public String getName() {
         return name == null || name.isEmpty() || name.isBlank() ? login : name;

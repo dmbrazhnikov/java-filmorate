@@ -1,16 +1,20 @@
-package ru.yandex.practicum.filmorate.test.controller;
+package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.test.NotFoundException;
-import ru.yandex.practicum.filmorate.test.model.User;
-import ru.yandex.practicum.filmorate.test.storage.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.test.storage.Storage;
+import ru.yandex.practicum.filmorate.NotFoundException;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.Storage;
+
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -21,9 +25,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class UserController {
 
     private final Storage<User> storage;
+    private final UserService userService;
 
-    public UserController(InMemoryUserStorage inMemoryUserStorage) {
+    public UserController(InMemoryUserStorage inMemoryUserStorage, UserService userService) {
         storage = inMemoryUserStorage;
+        this.userService = userService;
     }
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
@@ -73,10 +79,48 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public User get(@PathVariable Integer userId) {
+    public User getById(@PathVariable Integer userId) {
         log.debug("Получен запрос данных попользователя с ID {}", userId);
         return Optional.ofNullable(storage.get(userId)).orElseThrow(
-                () -> new NotFoundException("Фильм с ID " + userId + " не найден")
+                () -> new NotFoundException("Пользователь с ID " + userId + " не найден")
+        );
+    }
+
+    @PutMapping("/{userId}/friends/{friendUserId}")
+    @ResponseStatus(NO_CONTENT)
+    public void setFriendship(@PathVariable Integer userId, @PathVariable Integer friendUserId) {
+        User user = retrieve(userId), friendUser = retrieve(friendUserId);
+        userService.setFriendship(user, friendUser);
+    }
+
+    @DeleteMapping("/{userId}/friends/{friendUserId}")
+    @ResponseStatus(NO_CONTENT)
+    public void unsetFriendship(@PathVariable Integer userId, @PathVariable Integer friendUserId) {
+        User user = retrieve(userId), friendUser = retrieve(friendUserId);
+        userService.unsetFriendship(user, friendUser);
+    }
+
+    @GetMapping("/{userId}/friends")
+    public List<User> getFriends(@PathVariable Integer userId) {
+        User user = retrieve(userId);
+        return user.getFriends().stream()
+                .map(storage::get)
+                .collect(Collectors.toList());
+    }
+
+    // common - некорректное в данном случае слово
+    // https://translate.google.com/?sl=ru&tl=en&text=%D0%BE%D0%B1%D1%89%D0%B8%D0%B5%20%D0%B4%D1%80%D1%83%D0%B7%D1%8C%D1%8F&op=translate
+    @GetMapping("/{userId}/friends/common/{friendUserId}")
+    public List<User> getMutualFriends(@PathVariable Integer userId, @PathVariable Integer friendUserId) {
+        User user = retrieve(userId), friendUser = retrieve(friendUserId);
+        return userService.mutualFriendIds(user, friendUser).stream()
+                .map(storage::get)
+                .collect(Collectors.toList());
+    }
+
+    private User retrieve(Integer id) {
+        return Optional.ofNullable(storage.get(id)).orElseThrow(
+                () -> new NotFoundException("Пользователь с ID " + id + " не найден")
         );
     }
 }

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.test;
+package ru.yandex.practicum.filmorate;
 
 import org.springframework.web.bind.annotation.ResponseStatus;
 import static org.springframework.http.HttpStatus.*;
