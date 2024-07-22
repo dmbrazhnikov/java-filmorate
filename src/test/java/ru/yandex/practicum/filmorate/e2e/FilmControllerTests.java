@@ -43,7 +43,7 @@ class FilmControllerTests {
 	@Test
 	@DisplayName("Добавление с корректными атрибутами")
 	void addValid() {
-		filmClient.sendPostRequest(refFilm)
+		filmClient.sendPost(refFilm)
 				.then()
 				.statusCode(CREATED.value())
 				.and()
@@ -54,7 +54,7 @@ class FilmControllerTests {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("provideMoviesWithSingleNonValidAttribute")
 	void badRequest(Film film, String errorMessage) {
-		filmClient.sendPostRequest(film)
+		filmClient.sendPost(film)
 				.then()
 				.statusCode(BAD_REQUEST.value())
 				.and()
@@ -70,7 +70,7 @@ class FilmControllerTests {
 				.description("Лучшая роль Бенисио Дель Торо!")
 				.releaseDate(LocalDate.of(2007, 10, 19))
 				.build();
-		filmClient.sendPostRequest(anotherFilm);
+		filmClient.sendPost(anotherFilm);
 		filmClient.sendGet("")
 				.then()
 				.statusCode(OK.value())
@@ -81,13 +81,13 @@ class FilmControllerTests {
 	@DisplayName("Обновление")
 	@Test
 	void update() {
-		int filmId = filmClient.sendPostRequest(refFilm).path("id");
+		int filmId = filmClient.sendPost(refFilm).path("id");
 		String newDesc = "Джоди Фостер необычайно хороша!";
 		Film updatedFilm = refFilm.toBuilder()
 				.id(filmId)
 				.description(newDesc)
 				.build();
-		filmClient.sendPutRequest("", updatedFilm)
+		filmClient.sendPutWithPayload("", updatedFilm)
 				.then()
 				.statusCode(OK.value())
 				.and()
@@ -97,7 +97,7 @@ class FilmControllerTests {
 	@DisplayName("Получение по ID существующего")
 	@Test
 	void getExistingById() {
-		int filmId = filmClient.sendPostRequest(refFilm).path("id");
+		int filmId = filmClient.sendPost(refFilm).path("id");
 		refFilm.setId(filmId);
 		Film result = filmClient.sendGet("/" + filmId)
 				.then()

@@ -43,7 +43,7 @@ public class UserControllerTests {
     @Test
     @DisplayName("Добавление с корректными атрибутами")
     void addValid() {
-        userClient.sendPostRequest(refUser)
+        userClient.sendPost(refUser)
                 .then()
                 .statusCode(CREATED.value())
                 .and()
@@ -54,7 +54,7 @@ public class UserControllerTests {
     @ParameterizedTest(name = "{0}")
     @MethodSource({"provideUsersWithSingleNonValidAttribute"})
     void badRequest(User user, String errorMessage) {
-        userClient.sendPostRequest(user)
+        userClient.sendPost(user)
                 .then()
                 .statusCode(BAD_REQUEST.value())
                 .and()
@@ -70,7 +70,7 @@ public class UserControllerTests {
                 .email("user2@server.com")
                 .birthday(LocalDate.of(1982, 11, 19))
                 .build();
-        userClient.sendPostRequest(anotherUser);
+        userClient.sendPost(anotherUser);
         userClient.sendGet("")
                 .then()
                 .statusCode(OK.value())
@@ -81,13 +81,13 @@ public class UserControllerTests {
     @DisplayName("Обновление")
     @Test
     void update() {
-        int userId = userClient.sendPostRequest(refUser).path("id");
+        int userId = userClient.sendPost(refUser).path("id");
         String newName = "Василий";
         User updatedUser = refUser.toBuilder()
                 .id(userId)
                 .name(newName)
                 .build();
-        userClient.sendPutRequest(updatedUser)
+        userClient.sendPutWithPayload(updatedUser)
                 .then()
                 .statusCode(OK.value())
                 .and()
@@ -97,7 +97,7 @@ public class UserControllerTests {
     @DisplayName("Получение по ID существующего")
     @Test
     void getExistingById() {
-        int userId = userClient.sendPostRequest(refUser).path("id");
+        int userId = userClient.sendPost(refUser).path("id");
         refUser.setId(userId);
         User result = userClient.sendGet("/" + userId)
                 .then()
@@ -133,11 +133,11 @@ public class UserControllerTests {
         }
 
         @Test
-        @DisplayName("Существующие пользователи")
+        @DisplayName("Существующие")
         void setFriendshipForExisting() {
-            int user1Id = userClient.sendPostRequest(user1).path("id"),
-                    user2Id = userClient.sendPostRequest(user2).path("id");
-            userClient.sendPutRequest(String.format("/%d/friends/%d", user1Id, user2Id))
+            int user1Id = userClient.sendPost(user1).path("id"),
+                    user2Id = userClient.sendPost(user2).path("id");
+            userClient.sendPutWithoutPayload(String.format("/%d/friends/%d", user1Id, user2Id))
                     .then()
                     .statusCode(NO_CONTENT.value());
             User actualUser1 = userClient.sendGet("/" + user1Id)
@@ -152,6 +152,24 @@ public class UserControllerTests {
                     () -> assertTrue(actualUser1.getFriends().contains(user2Id)),
                     () -> assertTrue(actualUser2.getFriends().contains(user1Id))
             );
+        }
+
+        @Test
+        @DisplayName("Добавление несуществующего в друзья существующего")
+        void addNonExistingFriendToExistingUser() {
+            int user1Id = userClient.sendPost(user1).path("id");
+            userClient.sendPutWithoutPayload(String.format("/%d/friends/%d", user1Id, 9999))
+                    .then()
+                    .statusCode(NOT_FOUND.value());
+        }
+
+        @Test
+        @DisplayName("Добавление существующего в друзья несуществующего")
+        void addExistingFriendToNonExistingUser() {
+            int user1Id = userClient.sendPost(user1).path("id");
+            userClient.sendPutWithoutPayload(String.format("/%d/friends/%d", 9999, user1Id))
+                    .then()
+                    .statusCode(NOT_FOUND.value());
         }
     }
 

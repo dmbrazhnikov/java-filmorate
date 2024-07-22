@@ -21,7 +21,7 @@ public class RestAssuredClient {
                         .setParam("http.connection.timeout", 10000));
     }
 
-    public <T> Response sendPostRequest(String uriSuffix, T payload) {
+    public <T> Response sendPost(String uriSuffix, T payload) {
         Response response = null;
         try {
             response = given()
@@ -36,11 +36,11 @@ public class RestAssuredClient {
         return response;
     }
 
-    public <T> Response sendPostRequest(T payload) {
-        return sendPostRequest("", payload);
+    public <T> Response sendPost(T payload) {
+        return sendPost("", payload);
     }
 
-    public <T> Response sendPutRequest(String uriSuffix, T payload) {
+    public <T> Response sendPutWithPayload(String uriSuffix, T payload) {
         Response response = null;
         try {
             response = given()
@@ -54,8 +54,20 @@ public class RestAssuredClient {
         return response;
     }
 
-    public <T> Response sendPutRequest(T payload) {
-        return sendPutRequest("", payload);
+    public <T> Response sendPutWithPayload(T payload) {
+        return sendPutWithPayload("", payload);
+    }
+
+    public Response sendPutWithoutPayload(String uriSuffix) {
+        Response response = null;
+        try {
+            response = given()
+                    .config(config)
+                    .put(uriPrefix + uriSuffix);
+        } catch (Exception e) {
+            fail("Exception occurred: " + e.getClass() + " " + e.getMessage());
+        }
+        return response;
     }
 
     public Response sendGet(String uriSuffix) {
