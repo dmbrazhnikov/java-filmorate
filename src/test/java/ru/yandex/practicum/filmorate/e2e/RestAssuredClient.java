@@ -82,4 +82,16 @@ public class RestAssuredClient {
         }
         return response;
     }
+
+    public Response sendDelete(String uriSuffix) {
+        Response response = null;
+        try {
+            response = given()
+                    .config(config)
+                    .delete(uriPrefix + uriSuffix);
+        } catch (Exception e) {
+            fail("Exception occurred: " + e.getClass() + " " + e.getMessage());
+        }
+        return response;
+    }
 }

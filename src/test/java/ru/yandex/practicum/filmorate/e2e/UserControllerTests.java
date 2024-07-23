@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.e2e;
 
+import com.google.gson.reflect.TypeToken;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,12 +11,13 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import ru.yandex.practicum.filmorate.FilmorateApplication;
 import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -28,6 +30,7 @@ public class UserControllerTests {
 
     private static final RestAssuredClient userClient = new RestAssuredClient("/users");
     private static User refUser;
+    private static final AtomicInteger userSeq = new AtomicInteger(1);
 
     @LocalServerPort
     int port;
@@ -35,7 +38,7 @@ public class UserControllerTests {
     @BeforeEach
     void beforeEach() {
         RestAssured.port = port;
-        refUser = getRefUser();
+        refUser = getTestUser();
     }
 
     /* Некоторые проверки преднамеренно упрощены (неполны) для ускорения разработки */
@@ -64,12 +67,7 @@ public class UserControllerTests {
     @DisplayName("Получение всех")
     @Test
     void getAllUsers() {
-        User anotherUser = User.builder()
-                .login("user2")
-                .name("Тестовый пользователь 2")
-                .email("user2@server.com")
-                .birthday(LocalDate.of(1982, 11, 19))
-                .build();
+        User anotherUser = getTestUser();
         userClient.sendPost(anotherUser);
         userClient.sendGet("")
                 .then()
@@ -119,62 +117,127 @@ public class UserControllerTests {
     @DisplayName("Друзья")
     class FriendshipTests {
 
-        private User user1, user2;
+        private static User user1, user2;
 
         @BeforeEach
         void beforeEach() {
-            user1 = getRefUser();
-            user2 = User.builder()
-                    .login("user2")
-                    .name("Тестовый пользователь 2")
-                    .email("user2@server.com")
-                    .birthday(LocalDate.of(1988, 7, 17))
-                    .build();
-        }
-
-        @Test
-        @DisplayName("Существующие")
-        void setFriendshipForExisting() {
-            int user1Id = userClient.sendPost(user1).path("id"),
-                    user2Id = userClient.sendPost(user2).path("id");
-            userClient.sendPutWithoutPayload(String.format("/%d/friends/%d", user1Id, user2Id))
-                    .then()
-                    .statusCode(NO_CONTENT.value());
-            User actualUser1 = userClient.sendGet("/" + user1Id)
+            user1 = userClient.sendPost(getTestUser())
                     .then()
                     .extract()
                     .as(User.class);
-            User actualUser2 = userClient.sendGet("/" + user2Id)
+            user2 = userClient.sendPost(getTestUser())
+                    .then()
+                    .extract()
+                    .as(User.class);
+        }
+
+        @Test
+        @DisplayName("Добавление с обоими существующими")
+        void setFriendshipForExisting() {
+            userClient.sendPutWithoutPayload(String.format("/%d/friends/%d", user1.getId(), user2.getId()))
+                    .then()
+                    .statusCode(NO_CONTENT.value());
+            User actualUser1 = userClient.sendGet("/" + user1.getId())
+                    .then()
+                    .extract()
+                    .as(User.class);
+            User actualUser2 = userClient.sendGet("/" + user2.getId())
                     .then()
                     .extract()
                     .as(User.class);
             assertAll(
-                    () -> assertTrue(actualUser1.getFriends().contains(user2Id)),
-                    () -> assertTrue(actualUser2.getFriends().contains(user1Id))
+                    () -> assertTrue(actualUser1.getFriends().contains(user2.getId())),
+                    () -> assertTrue(actualUser2.getFriends().contains(user1.getId()))
             );
         }
 
-        @Test
-        @DisplayName("Добавление несуществующего в друзья существующего")
-        void addNonExistingFriendToExistingUser() {
-            int user1Id = userClient.sendPost(user1).path("id");
-            userClient.sendPutWithoutPayload(String.format("/%d/friends/%d", user1Id, 9999))
+        @ParameterizedTest(name = "{0}")
+        @DisplayName("Добавление с одним несуществующим")
+        @MethodSource("provideForFriendshipWithNonExisting")
+        void setFriendshipWithNonExisting(String pathSuffix) {
+            userClient.sendPutWithoutPayload(pathSuffix)
                     .then()
                     .statusCode(NOT_FOUND.value());
         }
 
         @Test
-        @DisplayName("Добавление существующего в друзья несуществующего")
-        void addExistingFriendToNonExistingUser() {
-            int user1Id = userClient.sendPost(user1).path("id");
-            userClient.sendPutWithoutPayload(String.format("/%d/friends/%d", 9999, user1Id))
+        @DisplayName("Удаление с обоими существующими")
+        void unsetFriendshipForExisting() {
+            userClient.sendDelete(String.format("/%d/friends/%d", user1.getId(), user2.getId()))
+                    .then()
+                    .statusCode(NO_CONTENT.value());
+            user1 = userClient.sendGet("/" + user1.getId())
+                    .then()
+                    .extract()
+                    .as(User.class);
+            assertFalse(user1.getFriends().contains(user2.getId()));
+        }
+
+        @ParameterizedTest(name = "{0}")
+        @DisplayName("Удаление с одним несуществующим")
+        @MethodSource("provideForFriendshipWithNonExisting")
+        void unsetFriendshipForNonExisting(String pathSuffix) {
+            userClient.sendDelete(pathSuffix)
                     .then()
                     .statusCode(NOT_FOUND.value());
+        }
+
+        @Test
+        @DisplayName("Список общих друзей")
+        void mutualFriendIds() {
+            User user3 = userClient.sendPost(getTestUser())
+                    .then()
+                    .extract()
+                    .as(User.class);
+            User user4 = userClient.sendPost(getTestUser())
+                    .then()
+                    .extract()
+                    .as(User.class);
+            User user5 = userClient.sendPost(getTestUser())
+                            .then()
+                            .extract()
+                            .as(User.class);
+            userClient.sendPutWithoutPayload(String.format("/%d/friends/%d", user1.getId(), user3.getId()));
+            userClient.sendPutWithoutPayload(String.format("/%d/friends/%d", user2.getId(), user4.getId()));
+            userClient.sendPutWithoutPayload(String.format("/%d/friends/%d", user1.getId(), user5.getId()));
+            userClient.sendPutWithoutPayload(String.format("/%d/friends/%d", user2.getId(), user5.getId()));
+            user5 = userClient.sendGet("/" + user5.getId())
+                    .then()
+                    .extract()
+                    .as(User.class);
+            List<User> mutualFriends1 = userClient.sendGet(String.format("/%d/friends/common/%d", user1.getId(), user2.getId()))
+                    .then()
+                    .statusCode(OK.value())
+                    .extract()
+                    .as(new UserListTypeToken().getType());
+            List<User> mutualFriends2 = userClient.sendGet(String.format("/%d/friends/common/%d", user2.getId(), user1.getId()))
+                    .then()
+                    .statusCode(OK.value())
+                    .extract()
+                    .as(new UserListTypeToken().getType());
+            User mutualFriend = user5;
+            assertAll(
+                    () -> assertEquals(mutualFriends1.get(0), mutualFriend),
+                    () -> assertEquals(mutualFriends1, mutualFriends2)
+            );
+        }
+
+        class UserListTypeToken extends TypeToken<List<User>> {}
+
+        private static Stream<Arguments> provideForFriendshipWithNonExisting() {
+            user1 = userClient.sendPutWithPayload(getTestUser())
+                    .then()
+                    .extract()
+                    .as(User.class);
+            return Stream.of(
+                    arguments(named("Существующий пользователь, несуществующий друг", String.format("/%d/friends/%d", user1.getId(), 9999))),
+                    arguments(named("Несуществующий пользователь, существующий друг", String.format("/%d/friends/%d", 9999, user1.getId())))
+            );
         }
     }
 
     private static Stream<Arguments> provideUsersWithSingleNonValidAttribute() {
-        refUser = getRefUser();
+        refUser = getTestUser();
         return Stream.of(
                 arguments(named("Логин null", refUser.toBuilder().login(null).build()),
                         "логин не может быть пустым"),
@@ -194,12 +257,16 @@ public class UserControllerTests {
         );
     }
 
-    private static User getRefUser() {
+    private static User getTestUser() {
+        int id = userSeq.getAndIncrement();
         return User.builder()
-                .login("user1")
-                .name("Тестовый пользователь 1")
-                .email("user1@server.com")
-                .birthday(LocalDate.of(1990, 5, 7))
-                .build();
+                .login("user" + id)
+                .name("Тестовый пользователь " + id)
+                .email("user" + id + "@server.com")
+                .birthday(LocalDate.of(
+                        ThreadLocalRandom.current().nextInt(1970, 2001),
+                        ThreadLocalRandom.current().nextInt(1, 13),
+                        ThreadLocalRandom.current().nextInt(1, 29))
+                ).build();
     }
 }
