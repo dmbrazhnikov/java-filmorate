@@ -1,13 +1,24 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.Storage;
+
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 
 @Service
 public class UserService {
+
+    private final Storage<User> userStorage;
+
+    public UserService(InMemoryUserStorage inMemoryUserStorage) {
+        userStorage = inMemoryUserStorage;
+    }
 
     //добавление в друзья
     public void setFriendship(User user1, User user2) {
@@ -26,5 +37,11 @@ public class UserService {
         Set<Integer> result = new HashSet<>(baseUser.getFriends());
         result.retainAll(userToCompareWith.getFriends());
         return result;
+    }
+
+    public User retrieveUser(Integer id) {
+        return Optional.ofNullable(userStorage.get(id)).orElseThrow(
+                () -> new NotFoundException("Пользователь с ID " + id + " не найден")
+        );
     }
 }

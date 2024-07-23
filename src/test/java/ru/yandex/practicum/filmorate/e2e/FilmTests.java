@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.FilmorateApplication;
 import ru.yandex.practicum.filmorate.model.Film;
 import java.time.LocalDate;
 import java.util.stream.Stream;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Named.named;
@@ -24,7 +23,7 @@ import static org.springframework.http.HttpStatus.*;
 
 @DisplayName("Фильм")
 @SpringBootTest(classes = FilmorateApplication.class, webEnvironment = RANDOM_PORT)
-class FilmControllerTests {
+class FilmTests {
 
 	private static final RestAssuredClient filmClient = new RestAssuredClient("/films");
 	private static Film refFilm;
@@ -107,8 +106,8 @@ class FilmControllerTests {
 		assertThat(result).isEqualTo(refFilm);
 	}
 
-	@DisplayName("Получение по ID несуществующего")
 	@Test
+	@DisplayName("Получение по ID несуществующего")
 	void getNonExistingById() {
 		filmClient.sendGet("/" + 9999)
 				.then()

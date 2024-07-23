@@ -86,41 +86,40 @@ public class UserController {
         );
     }
 
+    // добавление в друзья
     @PutMapping("/{userId}/friends/{friendUserId}")
     @ResponseStatus(NO_CONTENT)
     public void setFriendship(@PathVariable Integer userId, @PathVariable Integer friendUserId) {
-        User user = retrieve(userId), friendUser = retrieve(friendUserId);
+        User user = userService.retrieveUser(userId),
+                friendUser = userService.retrieveUser(friendUserId);
         userService.setFriendship(user, friendUser);
     }
 
+    // удаление из друзей
     @DeleteMapping("/{userId}/friends/{friendUserId}")
     @ResponseStatus(NO_CONTENT)
     public void unsetFriendship(@PathVariable Integer userId, @PathVariable Integer friendUserId) {
-        User user = retrieve(userId), friendUser = retrieve(friendUserId);
+        User user = userService.retrieveUser(userId), friendUser = userService.retrieveUser(friendUserId);
         userService.unsetFriendship(user, friendUser);
     }
 
+    // список друзей пользователя
     @GetMapping("/{userId}/friends")
     public List<User> getFriends(@PathVariable Integer userId) {
-        User user = retrieve(userId);
+        User user = userService.retrieveUser(userId);
         return user.getFriends().stream()
                 .map(storage::get)
                 .collect(Collectors.toList());
     }
 
+    // Общие для двух пользователей друзья
     // common - некорректное в данном случае слово
     // https://translate.google.com/?sl=ru&tl=en&text=%D0%BE%D0%B1%D1%89%D0%B8%D0%B5%20%D0%B4%D1%80%D1%83%D0%B7%D1%8C%D1%8F&op=translate
     @GetMapping("/{userId}/friends/common/{friendUserId}")
     public List<User> getMutualFriends(@PathVariable Integer userId, @PathVariable Integer friendUserId) {
-        User user = retrieve(userId), friendUser = retrieve(friendUserId);
+        User user = userService.retrieveUser(userId), friendUser = userService.retrieveUser(friendUserId);
         return userService.mutualFriendIds(user, friendUser).stream()
                 .map(storage::get)
                 .collect(Collectors.toList());
-    }
-
-    private User retrieve(Integer id) {
-        return Optional.ofNullable(storage.get(id)).orElseThrow(
-                () -> new NotFoundException("Пользователь с ID " + id + " не найден")
-        );
     }
 }

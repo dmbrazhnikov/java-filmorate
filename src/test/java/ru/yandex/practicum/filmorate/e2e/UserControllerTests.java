@@ -26,11 +26,10 @@ import static org.springframework.http.HttpStatus.*;
 
 @DisplayName("Пользователь")
 @SpringBootTest(classes = FilmorateApplication.class, webEnvironment = RANDOM_PORT)
-public class UserControllerTests {
+public class UserControllerTests extends BaseTest {
 
     private static final RestAssuredClient userClient = new RestAssuredClient("/users");
     private static User refUser;
-    private static final AtomicInteger userSeq = new AtomicInteger(1);
 
     @LocalServerPort
     int port;
@@ -225,7 +224,7 @@ public class UserControllerTests {
         class UserListTypeToken extends TypeToken<List<User>> {}
 
         private static Stream<Arguments> provideForFriendshipWithNonExisting() {
-            user1 = userClient.sendPutWithPayload(getTestUser())
+            user1 = userClient.sendPost(getTestUser())
                     .then()
                     .extract()
                     .as(User.class);
@@ -255,18 +254,5 @@ public class UserControllerTests {
                 arguments(named("Дата рождения - сегодня", refUser.toBuilder().birthday(LocalDate.now()).build()),
                         "дата рождения должна быть в прошлом")
         );
-    }
-
-    private static User getTestUser() {
-        int id = userSeq.getAndIncrement();
-        return User.builder()
-                .login("user" + id)
-                .name("Тестовый пользователь " + id)
-                .email("user" + id + "@server.com")
-                .birthday(LocalDate.of(
-                        ThreadLocalRandom.current().nextInt(1970, 2001),
-                        ThreadLocalRandom.current().nextInt(1, 13),
-                        ThreadLocalRandom.current().nextInt(1, 29))
-                ).build();
     }
 }
