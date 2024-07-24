@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Component
-public class InMemoryFilmStorage implements Storage<Film> {
+public class InMemoryFilmStorage implements Storage<Film, Integer> {
 
     private static final Map<Integer, Film> moviesById = new ConcurrentHashMap<>();
     private static final AtomicInteger idSequence = new AtomicInteger(1);
@@ -29,7 +29,7 @@ public class InMemoryFilmStorage implements Storage<Film> {
     }
 
     @Override
-    public Film get(int filmId) {
+    public Film get(Integer filmId) {
         return moviesById.get(filmId);
     }
 

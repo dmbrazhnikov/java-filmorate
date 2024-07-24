@@ -5,31 +5,25 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Component
-public class InMemoryUserStorage implements Storage<User> {
+public class InMemoryUserStorage implements Storage<User, Integer> {
 
     private static final Map<Integer, User> usersById = new ConcurrentHashMap<>();
-    private static final AtomicInteger idSequence = new AtomicInteger(1);
 
     @Override
-    public User add(User user) {
-        int userId = idSequence.getAndIncrement();
-        user.setId(userId);
-        usersById.put(userId, user);
-        return user;
-    }
-
-    @Override
-    public User update(User user) {
+    public void add(User user) {
         usersById.put(user.getId(), user);
-        return user;
     }
 
     @Override
-    public User get(int userId) {
+    public void update(User user) {
+        usersById.put(user.getId(), user);
+    }
+
+    @Override
+    public User get(Integer userId) {
         return usersById.get(userId);
     }
 
