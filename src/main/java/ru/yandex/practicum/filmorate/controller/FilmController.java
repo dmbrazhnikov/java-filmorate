@@ -6,12 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.Storage;
-import ru.yandex.practicum.filmorate.model.Film;
 import java.util.List;
 import java.util.Optional;
 import static org.springframework.http.HttpStatus.*;
@@ -116,8 +116,8 @@ public class FilmController {
 
     // список первых N фильмов по количеству отметок "Нравится"
     @GetMapping("/popular")
-    public List<Film> getTopLikedFilms(@RequestParam(required = false, defaultValue = "10") Integer count) {
+    public List<Film> getPopular(@RequestParam(required = false, defaultValue = "10") Integer count) {
         log.debug("Получен запрос списка из {} фильмов с наибольшим количеством отметок \"Нравится\"", count);
-        return filmService.getTopLikedFilms(count);
+        return filmService.getPopular(count);
     }
 }

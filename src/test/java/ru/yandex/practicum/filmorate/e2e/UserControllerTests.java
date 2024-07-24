@@ -2,7 +2,10 @@ package ru.yandex.practicum.filmorate.e2e;
 
 import com.google.gson.reflect.TypeToken;
 import io.restassured.RestAssured;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -12,8 +15,6 @@ import ru.yandex.practicum.filmorate.FilmorateApplication;
 import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -221,7 +222,8 @@ public class UserControllerTests extends BaseTest {
             );
         }
 
-        class UserListTypeToken extends TypeToken<List<User>> {}
+        class UserListTypeToken extends TypeToken<List<User>> {
+        }
 
         private static Stream<Arguments> provideForFriendshipWithNonExisting() {
             user1 = userClient.sendPost(getTestUser())

@@ -6,9 +6,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.Storage;
-
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -31,13 +29,15 @@ public class FilmService {
     }
 
     // вывод 10 наиболее популярных фильмов
-    public List<Film> getTopLikedFilms(int count) {
+    public List<Film> getPopular(int count) {
         SortedMap<Integer, Integer> likesByFilmId = new TreeMap<>(Comparator.reverseOrder());
-        storage.getAll().forEach(film -> likesByFilmId.put(film.getId(), film.getLikes().size()));
+        storage.getAll().stream()
+                .filter(film -> !film.getLikes().isEmpty())
+                .forEach(film -> likesByFilmId.put(film.getLikes().size(), film.getId()));
         return likesByFilmId.values().stream()
                 .map(storage::get)
                 .limit(count)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public Film retrieveFilm(Integer id) {

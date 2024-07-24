@@ -8,12 +8,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import ru.yandex.practicum.filmorate.model.Film;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Named.named;
-import static org.junit.jupiter.params.provider.Arguments.arguments;
+
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Named.named;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 @DisplayName("Валидация атрибутов фильма")
