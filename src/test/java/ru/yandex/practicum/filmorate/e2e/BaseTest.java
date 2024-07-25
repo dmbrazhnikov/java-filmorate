@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.e2e;
 
 import ru.yandex.practicum.filmorate.model.User;
+
 import java.time.LocalDate;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
