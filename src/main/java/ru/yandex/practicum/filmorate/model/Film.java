@@ -30,7 +30,5 @@ public class Film {
     private LocalDate releaseDate;
 
     @Positive
-    private Integer duration; // FIXME подгонка под кривые тесты пайпа
-
-    private final Set<Integer> likes = new HashSet<>();
+    private Integer duration;
 }

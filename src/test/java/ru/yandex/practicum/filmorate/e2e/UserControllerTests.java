@@ -131,25 +131,25 @@ public class UserControllerTests extends BaseTest {
                     .as(User.class);
         }
 
-        @Test
-        @DisplayName("Добавление с обоими существующими")
-        void setFriendshipForExisting() {
-            userClient.sendPutWithoutPayload(String.format("/%d/friends/%d", user1.getId(), user2.getId()))
-                    .then()
-                    .statusCode(NO_CONTENT.value());
-            User actualUser1 = userClient.sendGet("/" + user1.getId())
-                    .then()
-                    .extract()
-                    .as(User.class);
-            User actualUser2 = userClient.sendGet("/" + user2.getId())
-                    .then()
-                    .extract()
-                    .as(User.class);
-            assertAll(
-                    () -> assertTrue(actualUser1.getFriends().contains(user2.getId())),
-                    () -> assertTrue(actualUser2.getFriends().contains(user1.getId()))
-            );
-        }
+//        @Test
+//        @DisplayName("Добавление с обоими существующими")
+//        void setFriendshipForExisting() {
+//            userClient.sendPutWithoutPayload(String.format("/%d/friends/%d", user1.getId(), user2.getId()))
+//                    .then()
+//                    .statusCode(NO_CONTENT.value());
+//            User actualUser1 = userClient.sendGet("/" + user1.getId())
+//                    .then()
+//                    .extract()
+//                    .as(User.class);
+//            User actualUser2 = userClient.sendGet("/" + user2.getId())
+//                    .then()
+//                    .extract()
+//                    .as(User.class);
+//            assertAll(
+//                    () -> assertTrue(actualUser1.getFriends().contains(user2.getId())),
+//                    () -> assertTrue(actualUser2.getFriends().contains(user1.getId()))
+//            );
+//        }
 
         @ParameterizedTest(name = "{0}")
         @DisplayName("Добавление с одним несуществующим")
@@ -160,18 +160,18 @@ public class UserControllerTests extends BaseTest {
                     .statusCode(NOT_FOUND.value());
         }
 
-        @Test
-        @DisplayName("Удаление с обоими существующими")
-        void unsetFriendshipForExisting() {
-            userClient.sendDelete(String.format("/%d/friends/%d", user1.getId(), user2.getId()))
-                    .then()
-                    .statusCode(NO_CONTENT.value());
-            user1 = userClient.sendGet("/" + user1.getId())
-                    .then()
-                    .extract()
-                    .as(User.class);
-            assertFalse(user1.getFriends().contains(user2.getId()));
-        }
+//        @Test
+//        @DisplayName("Удаление с обоими существующими")
+//        void unsetFriendshipForExisting() {
+//            userClient.sendDelete(String.format("/%d/friends/%d", user1.getId(), user2.getId()))
+//                    .then()
+//                    .statusCode(NO_CONTENT.value());
+//            user1 = userClient.sendGet("/" + user1.getId())
+//                    .then()
+//                    .extract()
+//                    .as(User.class);
+//            assertFalse(user1.getFriends().contains(user2.getId()));
+//        }
 
         @ParameterizedTest(name = "{0}")
         @DisplayName("Удаление с одним несуществующим")

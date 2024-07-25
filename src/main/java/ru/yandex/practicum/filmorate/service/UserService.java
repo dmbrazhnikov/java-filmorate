@@ -1,12 +1,11 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.NullValueException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.storage.Storage;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -15,14 +14,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Service
+@RequiredArgsConstructor
 public class UserService implements EntityService<User, Integer> {
 
-    private final Storage<User, Integer> storage;
+    private final InMemoryUserStorage storage;
     private static final AtomicInteger idSequence = new AtomicInteger(1);
-
-    public UserService(InMemoryUserStorage inMemoryUserStorage) {
-        storage = inMemoryUserStorage;
-    }
 
     /* При создании значение поля User.id обязано быть пустым: управлять идентификаторами может исключительно сервер,
     а значит, клиент обязан прислать данные без идентификатора. Поэтому бездумно вешать валидацию на null нельзя. */
@@ -40,6 +36,7 @@ public class UserService implements EntityService<User, Integer> {
     public User update(User user) {
         if (user.getId() == null)
             throw new NullValueException("ru.yandex.practicum.filmorate.model.User.id");
+        get(user.getId()); // Костыль: тест, в нарушение RFC9110, ожидает 404 в ответ на попытку обновить несуществующего пользователя
         storage.update(user);
         return user;
     }
@@ -56,25 +53,43 @@ public class UserService implements EntityService<User, Integer> {
         return storage.getAll();
     }
 
-    //добавление в друзья
-    public void setFriendship(User user1, User user2) {
-        // TODO Перенести хранение в хранилище
-        user1.getFriends().add(user2.getId());
-        user2.getFriends().add(user1.getId());
+    // добавление в друзья
+    public void setFriendship(User user, User friendUser) {
+        Set<Integer> userFriendsIds = storage.getUserFriendsIds(user.getId()),
+                friendUserFriendsIds = storage.getUserFriendsIds(friendUser.getId());
+        userFriendsIds.add(friendUser.getId());
+        friendUserFriendsIds.add(user.getId());
+        storage.setUserFriendIds(user.getId(), userFriendsIds);
+        storage.setUserFriendIds(friendUser.getId(), friendUserFriendsIds);
     }
 
-    //удаление из друзей
-    public void unsetFriendship(User user1, User user2) {
-        // TODO Перенести хранение в хранилище
-        user1.getFriends().remove(user2.getId());
-        user2.getFriends().remove(user1.getId());
+    // удаление из друзей
+    public void unsetFriendship(User user, User friendUser) {
+        Set<Integer> userFriendsIds = storage.getUserFriendsIds(user.getId()),
+                friendUserFriendsIds = storage.getUserFriendsIds(friendUser.getId());
+        if (!userFriendsIds.isEmpty() && !friendUserFriendsIds.isEmpty()) {
+            userFriendsIds.remove(friendUser.getId());
+            storage.setUserFriendIds(user.getId(), userFriendsIds);
+            friendUserFriendsIds.remove(user.getId());
+            storage.setUserFriendIds(friendUser.getId(), friendUserFriendsIds);
+        }
     }
 
     // вывод списка общих друзей
-    public Set<Integer> mutualFriendIds(User baseUser, User userToCompareWith) {
-        // TODO Перенести хранение в хранилище
-        Set<Integer> result = new HashSet<>(baseUser.getFriends());
-        result.retainAll(userToCompareWith.getFriends());
-        return result;
+    public List<User> getMutualFriends(User user1, User user2) {
+        Set<Integer> user1FriendsIds = storage.getUserFriendsIds(user1.getId()),
+                user2FriendsIds = storage.getUserFriendsIds(user2.getId());
+        if (!user1FriendsIds.isEmpty() && !user2FriendsIds.isEmpty()) {
+            user1FriendsIds.retainAll(user2FriendsIds);
+        }
+        return user1FriendsIds.stream()
+                .map(storage::get)
+                .toList();
+    }
+
+    public List<User> getUserFriends(User user) {
+        return storage.getUserFriendsIds(user.getId()).stream()
+                .map(storage::get)
+                .toList();
     }
 }

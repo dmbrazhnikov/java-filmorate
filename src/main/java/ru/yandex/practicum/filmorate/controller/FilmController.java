@@ -23,14 +23,12 @@ public class FilmController {
     private final FilmService filmService;
     private final UserService userService;
 
-
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
     public Film add(@Validated @RequestBody Film film) {
         log.debug("Получен запрос создания фильма:\n{}", film);
         Film payload = filmService.add(film);
         log.info("Фильм с ID {} добавлен", payload.getId());
-        log.debug(payload.toString());
         return payload;
     }
 
@@ -39,14 +37,15 @@ public class FilmController {
         log.debug("Получен запрос обновления/создания фильма:\n{}", film);
         Film payload = filmService.update(film);
         log.info("Фильм с ID {} обновлён", payload.getId());
-        log.debug(payload.toString());
         return payload;
     }
 
     @GetMapping
     public List<Film> getAll() {
         log.debug("Получен запрос получения списка всех фильмов");
-        return filmService.getAll();
+        List<Film> result = filmService.getAll();
+        log.info("Отправлен список всех фильмов");
+        return result;
     }
 
     @GetMapping("/{filmId}")
@@ -81,8 +80,8 @@ public class FilmController {
 
     // список первых N фильмов по количеству отметок "Нравится"
     @GetMapping("/popular")
-    public List<Film> getPopular(@RequestParam(required = false, defaultValue = "10") Integer count) {
+    public List<Film> getMostPopular(@RequestParam(required = false, defaultValue = "10") Integer count) {
         log.debug("Получен запрос списка из {} фильмов с наибольшим количеством отметок \"Нравится\"", count);
-        return filmService.getPopular(count);
+        return filmService.getMostPopular(count);
     }
 }

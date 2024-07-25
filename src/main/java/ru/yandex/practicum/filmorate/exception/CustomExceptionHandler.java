@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.filmorate.validation.ErrorDTO;
 import java.util.List;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+
+import static org.springframework.http.HttpStatus.*;
 
 
 @Slf4j
@@ -19,12 +19,18 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(BAD_REQUEST)
-    public ErrorDTO processValidationError(MethodArgumentNotValidException ex) {
-        BindingResult result = ex.getBindingResult();
+    public ErrorDTO processValidationError(MethodArgumentNotValidException e) {
+        BindingResult result = e.getBindingResult();
         List<FieldError> fieldErrors = result.getFieldErrors();
         ErrorDTO error = new ErrorDTO("ошибка валидации");
         fieldErrors.forEach(fieldError -> error.add(fieldError.getObjectName(), fieldError.getField(), fieldError.getDefaultMessage()));
         return error;
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(NOT_FOUND)
+    public ErrorDTO processNotFound(NotFoundException e) {
+        return new ErrorDTO("Не найдено", e.getMessage());
     }
 
     @ExceptionHandler(NullValueException.class)

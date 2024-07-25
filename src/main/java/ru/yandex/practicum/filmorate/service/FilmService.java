@@ -1,40 +1,40 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.NullValueException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.Storage;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Service
+@RequiredArgsConstructor
 public class FilmService implements EntityService<Film, Integer> {
 
-    private final Storage<Film, Integer> storage;
-
-    public FilmService(InMemoryFilmStorage inMemoryFilmStorage) {
-        storage = inMemoryFilmStorage;
-    }
+    private final InMemoryFilmStorage storage;
+    private static final AtomicInteger idSequence = new AtomicInteger(1);
 
     // Сохранение
     @Override
     public Film add(Film film) {
-        return storage.add(film);
+        int filmId = idSequence.getAndIncrement();
+        film.setId(filmId);
+        storage.add(film);
+        return film;
     }
 
     // Обновление
     @Override
     public Film update(Film film) {
-        Film result;
-        Optional<Integer> filmIdOpt = Optional.ofNullable(film.getId());
-        Optional<Film> previousFilmOpt = filmIdOpt.map(storage::get);
-        if (filmIdOpt.isPresent() && previousFilmOpt.isPresent()) {
-            result = storage.update(film);
-        } else
-            throw new NotFoundException("Это 'костыль' для прохождения некорректных тестов (привет, RFC9110)");
-        return result;
+        if (film.getId() == null)
+            throw new NullValueException("ru.yandex.practicum.filmorate.model.Film.id");
+        get(film.getId()); // Костыль: тест, в нарушение RFC9110, ожидает 404 в ответ на попытку обновить несуществующий фильм
+        storage.update(film);
+        return film;
     }
 
     // Получение по ID
@@ -53,20 +53,27 @@ public class FilmService implements EntityService<Film, Integer> {
 
     // Добавление отметки "Нравится"
     public void setLike(Film film, User user) {
-        film.getLikes().add(user.getId());
+        Set<Integer> likedUsersIds = storage.getLikedUserIds(film.getId());
+        likedUsersIds.add(user.getId());
+        storage.setLikes(film.getId(), likedUsersIds);
     }
 
     // Удаление отметки "Нравится"
     public void unsetLike(Film film, User user) {
-        film.getLikes().remove(user.getId());
+        Set<Integer> likedUsersIds = storage.getLikedUserIds(film.getId());
+        if (!likedUsersIds.isEmpty()) {
+            likedUsersIds.remove(user.getId());
+            storage.setLikes(film.getId(), likedUsersIds);
+        }
     }
 
     // Вывод 10 наиболее популярных фильмов
-    public List<Film> getPopular(int count) {
+    public List<Film> getMostPopular(int count) {
         SortedMap<Integer, Integer> likesByFilmId = new TreeMap<>(Comparator.reverseOrder());
-        storage.getAll().stream()
-                .filter(film -> !film.getLikes().isEmpty())
-                .forEach(film -> likesByFilmId.put(film.getLikes().size(), film.getId()));
+        storage.getLikedUserIdsByFilmId().forEach((filmId, likedUserIds) -> {
+            if (!likedUserIds.isEmpty())
+                likesByFilmId.put(likedUserIds.size(), filmId);
+        });
         return likesByFilmId.values().stream()
                 .map(storage::get)
                 .limit(count)

@@ -33,8 +33,6 @@ public class User {
     @Past(message = "дата рождения должна быть в прошлом")
     private LocalDate birthday;
 
-    private final Set<Integer> friends = new HashSet<>();
-
     public String getName() {
         return name == null || name.isEmpty() || name.isBlank() ? login : name;
     }

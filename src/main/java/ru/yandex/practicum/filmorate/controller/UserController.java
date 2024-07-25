@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import java.util.List;
-import java.util.stream.Collectors;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -74,22 +73,22 @@ public class UserController {
     // список друзей пользователя
     @GetMapping("/{userId}/friends")
     public List<User> getFriends(@PathVariable Integer userId) {
-        // TODO Перенести логику в севрис
+        log.debug("Получен запрос списка друзей пользователя с ID {}", userId);
         User user = userService.get(userId);
-        return user.getFriends().stream()
-                .map(storage::get)
-                .collect(Collectors.toList());
+        List<User> result = userService.getUserFriends(user);
+        log.info("Отправлен список друзей пользователя с ID {}", userId);
+        return result;
     }
 
     // Общие для двух пользователей друзья
-    // common - некорректное в данном случае слово
-    // https://translate.google.com/?sl=ru&tl=en&text=%D0%BE%D0%B1%D1%89%D0%B8%D0%B5%20%D0%B4%D1%80%D1%83%D0%B7%D1%8C%D1%8F&op=translate
+    /* Слово "common" не подходит по смыслу для данного случая:
+    https://translate.google.com/?sl=ru&tl=en&text=%D0%BE%D0%B1%D1%89%D0%B8%D0%B5%20%D0%B4%D1%80%D1%83%D0%B7%D1%8C%D1%8F&op=translate */
     @GetMapping("/{userId}/friends/common/{friendUserId}")
     public List<User> getMutualFriends(@PathVariable Integer userId, @PathVariable Integer friendUserId) {
-        // TODO Перенести логику в севрис
-        User user = userService.retrieveUser(userId), friendUser = userService.retrieveUser(friendUserId);
-        return userService.mutualFriendIds(user, friendUser).stream()
-                .map(storage::get)
-                .collect(Collectors.toList());
+        log.debug("Получен запрос списка общих друзей пользователей с ID {} и {}", userId, friendUserId);
+        User user = userService.get(userId), friendUser = userService.get(friendUserId);
+        List<User> result = userService.getMutualFriends(user, friendUser);
+        log.info("Отправлен список общих друзей пользователей с ID {} и {}", userId, friendUserId);
+        return result;
     }
 }
