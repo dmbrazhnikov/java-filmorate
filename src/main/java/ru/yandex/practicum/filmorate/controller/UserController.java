@@ -26,7 +26,6 @@ public class UserController {
         log.debug("Получен запрос создания пользователя:\n{}", user);
         User payload = userService.add(user);
         log.info("Пользователь с ID {} добавлен", payload.getId());
-        log.debug(payload.toString());
         return payload;
     }
 
@@ -35,7 +34,6 @@ public class UserController {
         log.debug("Получен запрос обновления/создания пользователя:\n{}", user);
         User payload = userService.update(user);
         log.info("Пользователь с ID {} обновлён", payload.getId());
-        log.debug(payload.toString());
         return user;
     }
 
@@ -56,8 +54,7 @@ public class UserController {
     @ResponseStatus(NO_CONTENT)
     public void setFriendship(@PathVariable Integer userId, @PathVariable Integer friendUserId) {
         log.debug("Получен запрос добавления в друзья пользователя с ID {} от пользователя с ID {}", userId, friendUserId);
-        User user = userService.get(userId), friendUser = userService.get(friendUserId);
-        userService.setFriendship(user, friendUser);
+        userService.setFriendship(userId, friendUserId);
         log.info("Пользователь с ID {} добавлен в друзья пользователя с ID {}", friendUserId, userId);
     }
 
@@ -66,8 +63,7 @@ public class UserController {
     @ResponseStatus(NO_CONTENT)
     public void unsetFriendship(@PathVariable Integer userId, @PathVariable Integer friendUserId) {
         log.debug("Получен запрос удаления из друзей пользователя с ID {} от пользователя с ID {}", userId, friendUserId);
-        User user = userService.get(userId), friendUser = userService.get(friendUserId);
-        userService.unsetFriendship(user, friendUser);
+        userService.unsetFriendship(userId, friendUserId);
         log.info("Пользователь с ID {} удалён из друзей пользователя с ID {}", friendUserId, userId);
     }
 
@@ -75,8 +71,7 @@ public class UserController {
     @GetMapping("/{userId}/friends")
     public List<User> getFriends(@PathVariable Integer userId) {
         log.debug("Получен запрос списка друзей пользователя с ID {}", userId);
-        User user = userService.get(userId);
-        List<User> result = userService.getUserFriends(user);
+        List<User> result = userService.getUserFriends(userId);
         log.info("Отправлен список друзей пользователя с ID {}", userId);
         return result;
     }
@@ -87,8 +82,7 @@ public class UserController {
     @GetMapping("/{userId}/friends/common/{friendUserId}")
     public List<User> getMutualFriends(@PathVariable Integer userId, @PathVariable Integer friendUserId) {
         log.debug("Получен запрос списка общих друзей пользователей с ID {} и {}", userId, friendUserId);
-        User user = userService.get(userId), friendUser = userService.get(friendUserId);
-        List<User> result = userService.getMutualFriends(user, friendUser);
+        List<User> result = userService.getMutualFriends(userId, friendUserId);
         log.info("Отправлен список общих друзей пользователей с ID {} и {}", userId, friendUserId);
         return result;
     }

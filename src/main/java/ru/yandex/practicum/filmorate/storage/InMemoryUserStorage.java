@@ -6,7 +6,7 @@ import java.util.*;
 
 
 @Component
-public class InMemoryUserStorage implements Storage<User, Integer> {
+public class InMemoryUserStorage implements IUserStorage {
 
     private static final Map<Integer, User> usersByUserId = new HashMap<>();
     private static final Map<Integer, Set<Integer>> friendsIdsByUserId = new HashMap<>();
@@ -31,11 +31,28 @@ public class InMemoryUserStorage implements Storage<User, Integer> {
         return usersByUserId.values().stream().toList();
     }
 
-    public Set<Integer> getUserFriendsIds(Integer userId) {
-        return Optional.ofNullable(friendsIdsByUserId.get(userId)).orElse(new HashSet<>());
+    @Override
+    public void setFriendship(Integer userId, Integer friendUserId) {
+        Set<Integer> userFriendIds = Optional.ofNullable(friendsIdsByUserId.get(userId)).orElse(new HashSet<>()),
+                friendUserFriendIds = Optional.ofNullable(friendsIdsByUserId.get(friendUserId)).orElse(new HashSet<>());
+        userFriendIds.add(friendUserId);
+        friendUserFriendIds.add(userId);
+        friendsIdsByUserId.put(userId, userFriendIds);
+        friendsIdsByUserId.put(friendUserId, friendUserFriendIds);
     }
 
-    public void setUserFriendIds(Integer userId, Set<Integer> friendsIds) {
-        friendsIdsByUserId.put(userId, friendsIds);
+    @Override
+    public void unsetFriendship(Integer userId, Integer friendUserId) {
+        Set<Integer> userFriendIds = friendsIdsByUserId.get(userId),
+                friendUserFriendIds = friendsIdsByUserId.get(friendUserId);
+        if (userFriendIds != null && friendUserFriendIds != null) {
+            userFriendIds.remove(friendUserId);
+            friendUserFriendIds.remove(userId);
+        }
+    }
+
+    @Override
+    public Set<Integer> getUserFriendsIds(Integer userId) {
+        return Optional.ofNullable(friendsIdsByUserId.get(userId)).orElse(new HashSet<>());
     }
 }

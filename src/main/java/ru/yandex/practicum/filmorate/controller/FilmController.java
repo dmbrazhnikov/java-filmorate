@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 import java.util.List;
@@ -61,9 +60,7 @@ public class FilmController {
     @ResponseStatus(NO_CONTENT)
     public void setLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
         log.debug("Получен запрос добавления пользователем с ID {} отметки \"Нравится\" фильму с ID {}", userId, filmId);
-        Film film = filmService.get(filmId);
-        User user = userService.get(userId);
-        filmService.setLike(film, user);
+        filmService.setLike(filmId, userId);
         log.debug("Пользователь с ID {} установил отметку \"Нравится\" фильму с ID {}", userId, filmId);
     }
 
@@ -72,9 +69,7 @@ public class FilmController {
     @ResponseStatus(NO_CONTENT)
     public void unsetLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
         log.debug("Получен запрос удаления пользователем с ID {} отметки \"Нравится\" для фильма с ID {}", userId, filmId);
-        Film film = filmService.get(filmId);
-        User user = userService.get(userId);
-        filmService.unsetLike(film, user);
+        filmService.unsetLike(filmId, userId);
         log.debug("Пользователь с ID {} удалил отметку \"Нравится\" у фильма с ID {}", userId, filmId);
     }
 

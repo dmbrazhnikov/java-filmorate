@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.NullValueException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.IUserStorage;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -14,9 +14,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements EntityService<User, Integer> {
+public class UserService implements IUserService {
 
-    private final InMemoryUserStorage storage;
+    private final IUserStorage userStorage;
     private static final AtomicInteger idSequence = new AtomicInteger(1);
 
     /* При создании значение поля User.id обязано быть пустым: управлять идентификаторами может исключительно сервер,
@@ -25,7 +25,7 @@ public class UserService implements EntityService<User, Integer> {
     public User add(User user) {
         int userId = idSequence.getAndIncrement();
         user.setId(userId);
-        storage.add(user);
+        userStorage.add(user);
         return user;
     }
 
@@ -36,59 +36,54 @@ public class UserService implements EntityService<User, Integer> {
         if (user.getId() == null)
             throw new NullValueException("ru.yandex.practicum.filmorate.model.User.id");
         get(user.getId()); // Костыль: тест, в нарушение RFC9110, ожидает 404 в ответ на попытку обновить несуществующего пользователя
-        storage.update(user);
+        userStorage.update(user);
         return user;
     }
 
     @Override
     public User get(Integer id) {
-        return Optional.ofNullable(storage.get(id)).orElseThrow(
+        return Optional.ofNullable(userStorage.get(id)).orElseThrow(
                 () -> new NotFoundException("Пользователь с ID " + id + " не найден")
         );
     }
 
     @Override
     public List<User> getAll() {
-        return storage.getAll();
+        return userStorage.getAll();
     }
 
     // добавление в друзья
-    public void setFriendship(User user, User friendUser) {
-        Set<Integer> userFriendsIds = storage.getUserFriendsIds(user.getId()),
-                friendUserFriendsIds = storage.getUserFriendsIds(friendUser.getId());
-        userFriendsIds.add(friendUser.getId());
-        friendUserFriendsIds.add(user.getId());
-        storage.setUserFriendIds(user.getId(), userFriendsIds);
-        storage.setUserFriendIds(friendUser.getId(), friendUserFriendsIds);
+    @Override
+    public void setFriendship(Integer userId, Integer friendUserId) {
+        User user = get(userId), friendUser = get(friendUserId);
+        userStorage.setFriendship(user.getId(), friendUser.getId());
     }
 
     // удаление из друзей
-    public void unsetFriendship(User user, User friendUser) {
-        Set<Integer> userFriendsIds = storage.getUserFriendsIds(user.getId()),
-                friendUserFriendsIds = storage.getUserFriendsIds(friendUser.getId());
-        if (!userFriendsIds.isEmpty() && !friendUserFriendsIds.isEmpty()) {
-            userFriendsIds.remove(friendUser.getId());
-            storage.setUserFriendIds(user.getId(), userFriendsIds);
-            friendUserFriendsIds.remove(user.getId());
-            storage.setUserFriendIds(friendUser.getId(), friendUserFriendsIds);
-        }
+    @Override
+    public void unsetFriendship(Integer userId, Integer friendUserId) {
+        User user = get(userId), friendUser = get(friendUserId);
+        userStorage.unsetFriendship(user.getId(), friendUser.getId());
     }
 
     // вывод списка общих друзей
-    public List<User> getMutualFriends(User user1, User user2) {
-        Set<Integer> user1FriendsIds = storage.getUserFriendsIds(user1.getId()),
-                user2FriendsIds = storage.getUserFriendsIds(user2.getId());
-        if (!user1FriendsIds.isEmpty() && !user2FriendsIds.isEmpty()) {
+    @Override
+    public List<User> getMutualFriends(Integer user1Id, Integer user2Id) {
+        User user1 = get(user1Id), user2 = get(user2Id);
+        Set<Integer> user1FriendsIds = userStorage.getUserFriendsIds(user1.getId()),
+                user2FriendsIds = userStorage.getUserFriendsIds(user2.getId());
+        if (!user1FriendsIds.isEmpty() && !user2FriendsIds.isEmpty())
             user1FriendsIds.retainAll(user2FriendsIds);
-        }
         return user1FriendsIds.stream()
-                .map(storage::get)
+                .map(userStorage::get)
                 .toList();
     }
 
-    public List<User> getUserFriends(User user) {
-        return storage.getUserFriendsIds(user.getId()).stream()
-                .map(storage::get)
+    @Override
+    public List<User> getUserFriends(Integer userId) {
+        User user = get(userId);
+        return userStorage.getUserFriendsIds(user.getId()).stream()
+                .map(userStorage::get)
                 .toList();
     }
 }

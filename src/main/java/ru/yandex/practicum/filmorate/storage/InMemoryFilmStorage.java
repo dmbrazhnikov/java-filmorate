@@ -7,7 +7,7 @@ import java.util.*;
 
 
 @Component
-public class InMemoryFilmStorage implements Storage<Film, Integer> {
+public class InMemoryFilmStorage implements IFilmStorage {
 
     private final Map<Integer, Film> filmsById = new HashMap<>();
     private final Map<Integer, Set<Integer>> likedUserIdsByFilmId = new HashMap<>();
@@ -33,14 +33,21 @@ public class InMemoryFilmStorage implements Storage<Film, Integer> {
         return filmsById.values().stream().toList();
     }
 
-    public Set<Integer> getLikedUserIds(Integer filmId) {
-        return Optional.ofNullable(likedUserIdsByFilmId.get(filmId)).orElse(new HashSet<>());
-    }
-
-    public void setLikes(Integer filmId, Set<Integer> likedUserIds) {
+    @Override
+    public void setLike(Integer filmId, Integer userId) {
+        Set<Integer> likedUserIds = Optional.ofNullable(likedUserIdsByFilmId.get(filmId)).orElse(new HashSet<>());
+        likedUserIds.add(userId);
         likedUserIdsByFilmId.put(filmId, likedUserIds);
     }
 
+    @Override
+    public void unsetLike(Integer filmId, Integer userId) {
+        Set<Integer> likedUserIds = likedUserIdsByFilmId.get(filmId);
+        if (likedUserIds != null)
+            likedUserIds.remove(userId);
+    }
+
+    @Override
     public Map<Integer, Set<Integer>> getLikedUserIdsByFilmId() {
         return new HashMap<>(likedUserIdsByFilmId);
     }
