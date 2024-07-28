@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.service.UserServiceImpl;
+import ru.yandex.practicum.filmorate.validation.UpdateValidationGroup;
 import java.util.List;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -18,7 +20,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(value = "/users", produces = APPLICATION_JSON_VALUE)
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
@@ -30,7 +32,7 @@ public class UserController {
     }
 
     @PutMapping(consumes = APPLICATION_JSON_VALUE)
-    public User update(@Validated @RequestBody User user) {
+    public User update(@Validated({UpdateValidationGroup.class, Default.class}) @RequestBody User user) {
         log.debug("Получен запрос обновления/создания пользователя:\n{}", user);
         User payload = userService.update(user);
         log.info("Пользователь с ID {} обновлён", payload.getId());

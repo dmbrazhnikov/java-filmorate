@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.NullValueException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.IUserStorage;
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements IUserService {
+public class UserServiceImpl implements IUserService {
 
     private final IUserStorage userStorage;
     private static final AtomicInteger idSequence = new AtomicInteger(1);
@@ -33,8 +32,6 @@ public class UserService implements IUserService {
     * отдельное исключение по аналогии с NotFoundException. */
     @Override
     public User update(User user) {
-        if (user.getId() == null)
-            throw new NullValueException("ru.yandex.practicum.filmorate.model.User.id");
         get(user.getId()); // Костыль: тест, в нарушение RFC9110, ожидает 404 в ответ на попытку обновить несуществующего пользователя
         userStorage.update(user);
         return user;

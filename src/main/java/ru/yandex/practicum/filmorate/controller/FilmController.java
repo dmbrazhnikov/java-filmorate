@@ -5,8 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.service.FilmServiceImpl;
+import jakarta.validation.groups.Default;
+import ru.yandex.practicum.filmorate.validation.UpdateValidationGroup;
 import java.util.List;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -19,8 +20,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(value = "/films", produces = APPLICATION_JSON_VALUE)
 public class FilmController {
 
-    private final FilmService filmService;
-    private final UserService userService;
+    private final FilmServiceImpl filmService;
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
@@ -32,7 +32,7 @@ public class FilmController {
     }
 
     @PutMapping(consumes = APPLICATION_JSON_VALUE)
-    public Film update(@Validated @RequestBody Film film) {
+    public Film update(@Validated({UpdateValidationGroup.class, Default.class}) @RequestBody Film film) {
         log.debug("Получен запрос обновления/создания фильма:\n{}", film);
         Film payload = filmService.update(film);
         log.info("Фильм с ID {} обновлён", payload.getId());

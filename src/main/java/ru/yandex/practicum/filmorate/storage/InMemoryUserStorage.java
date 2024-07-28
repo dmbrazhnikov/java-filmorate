@@ -33,8 +33,8 @@ public class InMemoryUserStorage implements IUserStorage {
 
     @Override
     public void setFriendship(Integer userId, Integer friendUserId) {
-        Set<Integer> userFriendIds = Optional.ofNullable(friendsIdsByUserId.get(userId)).orElse(new HashSet<>()),
-                friendUserFriendIds = Optional.ofNullable(friendsIdsByUserId.get(friendUserId)).orElse(new HashSet<>());
+        Set<Integer> userFriendIds = friendsIdsByUserId.computeIfAbsent(userId, HashSet::new),
+                friendUserFriendIds = friendsIdsByUserId.computeIfAbsent(friendUserId, HashSet::new);
         userFriendIds.add(friendUserId);
         friendUserFriendIds.add(userId);
         friendsIdsByUserId.put(userId, userFriendIds);

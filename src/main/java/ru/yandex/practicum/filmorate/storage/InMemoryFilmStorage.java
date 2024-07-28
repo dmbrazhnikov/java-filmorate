@@ -35,7 +35,7 @@ public class InMemoryFilmStorage implements IFilmStorage {
 
     @Override
     public void setLike(Integer filmId, Integer userId) {
-        Set<Integer> likedUserIds = Optional.ofNullable(likedUserIdsByFilmId.get(filmId)).orElse(new HashSet<>());
+        Set<Integer> likedUserIds = likedUserIdsByFilmId.computeIfAbsent(filmId, HashSet::new);
         likedUserIds.add(userId);
         likedUserIdsByFilmId.put(filmId, likedUserIds);
     }

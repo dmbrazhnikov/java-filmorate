@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Data;
+import ru.yandex.practicum.filmorate.validation.UpdateValidationGroup;
 import java.time.LocalDate;
 
 
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class User {
 
+    @NotNull(groups = UpdateValidationGroup.class)
     private Integer id;
 
     @NotNull(message = "логин не может быть пустым")

@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.NullValueException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.IFilmStorage;
@@ -12,13 +11,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Service
-public class FilmService implements IFilmService {
+public class FilmServiceImpl implements IFilmService {
 
     private final IFilmStorage filmStorage;
     private final IUserService userService;
     private static final AtomicInteger idSequence = new AtomicInteger(1);
 
-    public FilmService(InMemoryFilmStorage storage, UserService userService) {
+    public FilmServiceImpl(InMemoryFilmStorage storage, UserServiceImpl userService) {
         filmStorage = storage;
         this.userService = userService;
     }
@@ -35,8 +34,6 @@ public class FilmService implements IFilmService {
     // Обновление
     @Override
     public Film update(Film film) {
-        if (film.getId() == null)
-            throw new NullValueException("ru.yandex.practicum.filmorate.model.Film.id");
         get(film.getId()); // Костыль: тест, в нарушение RFC9110, ожидает 404 в ответ на попытку обновить несуществующий фильм
         filmStorage.update(film);
         return film;

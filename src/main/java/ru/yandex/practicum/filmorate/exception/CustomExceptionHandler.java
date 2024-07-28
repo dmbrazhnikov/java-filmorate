@@ -32,13 +32,6 @@ public class CustomExceptionHandler {
         return new ErrorDTO("Не найдено", e.getMessage());
     }
 
-    @ExceptionHandler(NullValueException.class)
-    @ResponseStatus(BAD_REQUEST)
-    public ErrorDTO processNullValueException(NullValueException e) {
-        log.error("Пустое значение поля {} недопустимо", e.getFieldWithNullValueName());
-        return new ErrorDTO("Пустое значение поля " + e.getFieldWithNullValueName() + " недопустимо");
-    }
-
     @ExceptionHandler(Exception.class)
     @ResponseStatus(INTERNAL_SERVER_ERROR)
     public ErrorDTO processAnyException(Exception e) {
