@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.test.e2e;
+package ru.yandex.practicum.filmorate.e2e;
 
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,10 +9,13 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import ru.yandex.practicum.filmorate.test.FilmorateApplication;
-import ru.yandex.practicum.filmorate.test.model.Film;
+import ru.yandex.practicum.filmorate.FilmorateApplication;
+import ru.yandex.practicum.filmorate.model.Film;
+
 import java.time.LocalDate;
 import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -22,7 +25,7 @@ import static org.springframework.http.HttpStatus.*;
 
 @DisplayName("Фильм")
 @SpringBootTest(classes = FilmorateApplication.class, webEnvironment = RANDOM_PORT)
-class FilmControllerTests {
+class FilmTests {
 
 	private static final RestAssuredClient filmClient = new RestAssuredClient("/films");
 	private static Film refFilm;
@@ -41,7 +44,7 @@ class FilmControllerTests {
 	@Test
 	@DisplayName("Добавление с корректными атрибутами")
 	void addValid() {
-		filmClient.sendPostRequest(refFilm)
+		filmClient.sendPost(refFilm)
 				.then()
 				.statusCode(CREATED.value())
 				.and()
@@ -52,7 +55,7 @@ class FilmControllerTests {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("provideMoviesWithSingleNonValidAttribute")
 	void badRequest(Film film, String errorMessage) {
-		filmClient.sendPostRequest(film)
+		filmClient.sendPost(film)
 				.then()
 				.statusCode(BAD_REQUEST.value())
 				.and()
@@ -68,8 +71,8 @@ class FilmControllerTests {
 				.description("Лучшая роль Бенисио Дель Торо!")
 				.releaseDate(LocalDate.of(2007, 10, 19))
 				.build();
-		filmClient.sendPostRequest(anotherFilm);
-		filmClient.sendGetAllRequest()
+		filmClient.sendPost(anotherFilm);
+		filmClient.sendGet("")
 				.then()
 				.statusCode(OK.value())
 				.and()
@@ -79,17 +82,38 @@ class FilmControllerTests {
 	@DisplayName("Обновление")
 	@Test
 	void update() {
-		int movieId = filmClient.sendPostRequest(refFilm).path("id");
+		int filmId = filmClient.sendPost(refFilm).path("id");
 		String newDesc = "Джоди Фостер необычайно хороша!";
 		Film updatedFilm = refFilm.toBuilder()
-				.id(movieId)
+				.id(filmId)
 				.description(newDesc)
 				.build();
-		filmClient.sendPutRequest(updatedFilm)
+		filmClient.sendPutWithPayload("", updatedFilm)
 				.then()
 				.statusCode(OK.value())
 				.and()
 				.assertThat().body("description", equalTo(newDesc));
+	}
+
+	@DisplayName("Получение по ID существующего")
+	@Test
+	void getExistingById() {
+		int filmId = filmClient.sendPost(refFilm).path("id");
+		refFilm.setId(filmId);
+		Film result = filmClient.sendGet("/" + filmId)
+				.then()
+				.statusCode(OK.value())
+				.extract()
+				.as(Film.class);
+		assertThat(result).isEqualTo(refFilm);
+	}
+
+	@Test
+	@DisplayName("Получение по ID несуществующего")
+	void getNonExistingById() {
+		filmClient.sendGet("/" + 9999)
+				.then()
+				.statusCode(NOT_FOUND.value());
 	}
 
 	private static Stream<Arguments> provideMoviesWithSingleNonValidAttribute() {

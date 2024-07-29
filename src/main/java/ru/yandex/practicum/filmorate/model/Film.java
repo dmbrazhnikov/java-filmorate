@@ -1,12 +1,14 @@
-package ru.yandex.practicum.filmorate.test.model;
+package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.test.validation.IsAfter;
+import ru.yandex.practicum.filmorate.validation.IsAfter;
+import ru.yandex.practicum.filmorate.validation.UpdateValidationGroup;
 import java.time.LocalDate;
 
 
@@ -15,6 +17,7 @@ import java.time.LocalDate;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Film {
 
+    @NotNull(groups = UpdateValidationGroup.class)
     private Integer id;
 
     @NotEmpty(message = "название не может быть пустым")
@@ -27,5 +30,5 @@ public class Film {
     private LocalDate releaseDate;
 
     @Positive
-    private Integer duration; // FIXME подгонка под кривые тесты пайпа
+    private Integer duration;
 }

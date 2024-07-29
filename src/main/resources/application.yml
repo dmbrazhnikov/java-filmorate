@@ -5,3 +5,9 @@ spring:
   mvc:
     format:
       date: yyyy-MM-dd
+
+logging:
+  level:
+    org:
+      zalando:
+        logbook: TRACE
