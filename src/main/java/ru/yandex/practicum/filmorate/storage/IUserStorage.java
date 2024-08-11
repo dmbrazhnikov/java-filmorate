@@ -11,13 +11,13 @@ public interface IUserStorage {
 
     void update(User user);
 
-    User get(Integer userId);
+    User get(Long userId);
 
     List<User> getAll();
 
-    void setFriendship(Integer userId, Integer friendUserId);
+    void setFriendship(Long userId, Long friendUserId);
 
-    void unsetFriendship(Integer userId, Integer friendUserId);
+    void unsetFriendship(Long userId, Long friendUserId);
 
-    Set<Integer> getUserFriendsIds(Integer userId);
+    Set<Long> getUserFriendsIds(Long userId);
 }

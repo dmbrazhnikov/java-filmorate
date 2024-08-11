@@ -1,39 +1,42 @@
 // Use DBML to define your database structure
 // Docs: https://dbml.dbdiagram.io/docs
 // https://dbdiagram.io/d
+Table genre {
+  id int [primary key]
+  name varchar [unique, not null]
+}
+
+Table mpa_rating {
+  id int [primary key]
+  name varchar [unique, not null]
+}
+
 Table film {
   id int [primary key]
   name varchar [not null]
   description varchar(200)
   release_date date
   duration_minutes int
-  rating_id int [ref: - rating.id]
 }
 
-Table genre {
-  id int [primary key]
-  name varchar [not null]
-}
-
-Table rating {
-  id int [primary key]
-  name varchar [not null]
+Table film_rating {
+  film_id int [ref: - film.id]
+  rating_id int [ref: - mpa_rating.id]
+  indexes {
+    (film_id, rating_id) [pk]
+  }
 }
 
 Table film_genre {
+  id int [primary key]
   film_id int [ref: > film.id]
   genre_id int [ref: > genre.id]
-  indexes {
-    (film_id, genre_id) [pk]
-  }
 }
 
 Table film_user_like {
+  id int [primary key]
   film_id int [ref: > film.id]
   user_id int [ref: > user.id]
-  indexes {
-    (film_id, user_id) [pk]
-  }
 }
 
 Table user {
@@ -46,7 +49,7 @@ Table user {
 
 Table friendship_status {
   id int [primary key]
-  name varchar [not null]
+  name varchar [unique, not null]
 }
 
 Table user_friendship {

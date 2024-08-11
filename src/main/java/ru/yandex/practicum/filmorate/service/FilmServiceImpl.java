@@ -4,10 +4,9 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.database.FilmDatabaseStorage;
 import ru.yandex.practicum.filmorate.storage.IFilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Service
@@ -15,9 +14,8 @@ public class FilmServiceImpl implements IFilmService {
 
     private final IFilmStorage filmStorage;
     private final IUserService userService;
-    private static final AtomicInteger idSequence = new AtomicInteger(1);
 
-    public FilmServiceImpl(InMemoryFilmStorage storage, UserServiceImpl userService) {
+    public FilmServiceImpl(FilmDatabaseStorage storage, UserServiceImpl userService) {
         filmStorage = storage;
         this.userService = userService;
     }
@@ -25,8 +23,6 @@ public class FilmServiceImpl implements IFilmService {
     // Сохранение
     @Override
     public Film add(Film film) {
-        int filmId = idSequence.getAndIncrement();
-        film.setId(filmId);
         filmStorage.add(film);
         return film;
     }
@@ -41,7 +37,7 @@ public class FilmServiceImpl implements IFilmService {
 
     // Получение по ID
     @Override
-    public Film get(Integer id) {
+    public Film get(Long id) {
         return Optional.ofNullable(filmStorage.get(id)).orElseThrow(
                 () -> new NotFoundException("Фильм с ID " + id + " не найден")
         );
@@ -55,7 +51,7 @@ public class FilmServiceImpl implements IFilmService {
 
     // Добавление отметки "Нравится"
     @Override
-    public void setLike(Integer filmId, Integer userId) {
+    public void setLike(Long filmId, Long userId) {
         Film film = get(filmId);
         User user = userService.get(userId);
         filmStorage.setLike(film.getId(), user.getId());
@@ -63,7 +59,7 @@ public class FilmServiceImpl implements IFilmService {
 
     // Удаление отметки "Нравится"
     @Override
-    public void unsetLike(Integer filmId, Integer userId) {
+    public void unsetLike(Long filmId, Long userId) {
         Film film = get(filmId);
         User user = userService.get(userId);
         filmStorage.unsetLike(film.getId(), user.getId());
@@ -72,7 +68,7 @@ public class FilmServiceImpl implements IFilmService {
     // Вывод 10 наиболее популярных фильмов
     @Override
     public List<Film> getMostPopular(int count) {
-        SortedMap<Integer, Integer> likesByFilmId = new TreeMap<>(Comparator.reverseOrder());
+        SortedMap<Integer, Long> likesByFilmId = new TreeMap<>(Comparator.reverseOrder());
         filmStorage.getLikedUserIdsByFilmId().forEach((filmId, likedUserIds) -> {
             if (!likedUserIds.isEmpty())
                 likesByFilmId.put(likedUserIds.size(), filmId);

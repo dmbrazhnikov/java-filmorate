@@ -17,7 +17,7 @@ import java.time.LocalDate;
 public class User {
 
     @NotNull(groups = UpdateValidationGroup.class)
-    private Integer id;
+    private Long id;
 
     @NotNull(message = "логин не может быть пустым")
     @Pattern(regexp = "^[^ ]+$", message = "некорректный логин")

@@ -12,13 +12,13 @@ public interface IFilmStorage {
 
     void update(Film film);
 
-    Film get(Integer filmId);
+    Film get(Long filmId);
 
     List<Film> getAll();
 
-    void setLike(Integer filmId, Integer userId);
+    void setLike(Long filmId, Long userId);
 
-    void unsetLike(Integer filmId, Integer userId);
+    void unsetLike(Long filmId, Long userId);
 
-    Map<Integer, Set<Integer>> getLikedUserIdsByFilmId();
+    Map<Long, Set<Long>> getLikedUserIdsByFilmId();
 }

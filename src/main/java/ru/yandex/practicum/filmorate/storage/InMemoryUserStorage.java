@@ -8,8 +8,8 @@ import java.util.*;
 @Component
 public class InMemoryUserStorage implements IUserStorage {
 
-    private static final Map<Integer, User> usersByUserId = new HashMap<>();
-    private static final Map<Integer, Set<Integer>> friendsIdsByUserId = new HashMap<>();
+    private static final Map<Long, User> usersByUserId = new HashMap<>();
+    private static final Map<Long, Set<Long>> friendsIdsByUserId = new HashMap<>();
 
     @Override
     public void add(User user) {
@@ -22,7 +22,7 @@ public class InMemoryUserStorage implements IUserStorage {
     }
 
     @Override
-    public User get(Integer userId) {
+    public User get(Long userId) {
         return usersByUserId.get(userId);
     }
 
@@ -32,9 +32,9 @@ public class InMemoryUserStorage implements IUserStorage {
     }
 
     @Override
-    public void setFriendship(Integer userId, Integer friendUserId) {
-        Set<Integer> userFriendIds = friendsIdsByUserId.computeIfAbsent(userId, HashSet::new),
-                friendUserFriendIds = friendsIdsByUserId.computeIfAbsent(friendUserId, HashSet::new);
+    public void setFriendship(Long userId, Long friendUserId) {
+        Set<Long> userFriendIds = friendsIdsByUserId.computeIfAbsent(userId, v -> new HashSet<>()),
+                friendUserFriendIds = friendsIdsByUserId.computeIfAbsent(friendUserId, v -> new HashSet<>());
         userFriendIds.add(friendUserId);
         friendUserFriendIds.add(userId);
         friendsIdsByUserId.put(userId, userFriendIds);
@@ -42,8 +42,8 @@ public class InMemoryUserStorage implements IUserStorage {
     }
 
     @Override
-    public void unsetFriendship(Integer userId, Integer friendUserId) {
-        Set<Integer> userFriendIds = friendsIdsByUserId.get(userId),
+    public void unsetFriendship(Long userId, Long friendUserId) {
+        Set<Long> userFriendIds = friendsIdsByUserId.get(userId),
                 friendUserFriendIds = friendsIdsByUserId.get(friendUserId);
         if (userFriendIds != null && friendUserFriendIds != null) {
             userFriendIds.remove(friendUserId);
@@ -52,7 +52,7 @@ public class InMemoryUserStorage implements IUserStorage {
     }
 
     @Override
-    public Set<Integer> getUserFriendsIds(Integer userId) {
+    public Set<Long> getUserFriendsIds(Long userId) {
         return Optional.ofNullable(friendsIdsByUserId.get(userId)).orElse(new HashSet<>());
     }
 }

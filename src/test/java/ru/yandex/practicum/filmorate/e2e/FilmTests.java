@@ -67,7 +67,7 @@ class FilmTests {
 	void getAllMovies() {
 		Film anotherFilm = Film.builder()
 				.name("Things we lost in the fire")
-				.duration(118)
+				.durationMinutes(118)
 				.description("Лучшая роль Бенисио Дель Торо!")
 				.releaseDate(LocalDate.of(2007, 10, 19))
 				.build();
@@ -82,7 +82,7 @@ class FilmTests {
 	@DisplayName("Обновление")
 	@Test
 	void update() {
-		int filmId = filmClient.sendPost(refFilm).path("id");
+		Long filmId = filmClient.sendPost(refFilm).path("id");
 		String newDesc = "Джоди Фостер необычайно хороша!";
 		Film updatedFilm = refFilm.toBuilder()
 				.id(filmId)
@@ -98,7 +98,7 @@ class FilmTests {
 	@DisplayName("Получение по ID существующего")
 	@Test
 	void getExistingById() {
-		int filmId = filmClient.sendPost(refFilm).path("id");
+		Long filmId = filmClient.sendPost(refFilm).path("id");
 		refFilm.setId(filmId);
 		Film result = filmClient.sendGet("/" + filmId)
 				.then()
@@ -140,7 +140,7 @@ class FilmTests {
 		return Film.builder()
 				.name("Молчание ягнят")
 				.description("111")
-				.duration(118)
+				.durationMinutes(118)
 				.releaseDate(LocalDate.of(1991, 2, 14))
 				.build();
 	}
