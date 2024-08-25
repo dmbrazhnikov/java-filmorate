@@ -1,10 +1,13 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.TestsWorkaroundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.database.FilmDatabaseStorage;
 import ru.yandex.practicum.filmorate.storage.IFilmStorage;
+import ru.yandex.practicum.filmorate.storage.database.GenreRepository;
+import ru.yandex.practicum.filmorate.storage.database.MpaRatingRepository;
 import java.util.*;
 
 
@@ -13,15 +16,25 @@ public class FilmServiceImpl implements IFilmService {
 
     private final IFilmStorage filmStorage;
     private final IUserService userService;
+    private final MpaRatingRepository ratingRepository;
+    private final GenreRepository genreRepository;
 
-    public FilmServiceImpl(FilmDatabaseStorage storage, UserServiceImpl userService) {
+    public FilmServiceImpl(
+            FilmDatabaseStorage storage,
+            UserServiceImpl userService,
+            MpaRatingRepository ratingRepository,
+            GenreRepository genreRepository
+    ) {
         filmStorage = storage;
         this.userService = userService;
+        this.ratingRepository = ratingRepository;
+        this.genreRepository = genreRepository;
     }
 
     // Сохранение
     @Override
     public Film add(Film film) {
+        checkFilmGenresAndRating(film);
         filmStorage.add(film);
         return film;
     }
@@ -29,6 +42,7 @@ public class FilmServiceImpl implements IFilmService {
     // Обновление
     @Override
     public Film update(Film film) {
+        checkFilmGenresAndRating(film);
         filmStorage.update(film);
         return film;
     }
@@ -73,5 +87,14 @@ public class FilmServiceImpl implements IFilmService {
                 .map(filmStorage::get)
                 .limit(count)
                 .toList();
+    }
+
+    private void checkFilmGenresAndRating(Film film) {
+        if (!ratingRepository.existsById(film.getMpa().getId()))
+            throw new TestsWorkaroundException("Рейтинг с ID " + film.getMpa().getId() + " не найден");
+        film.getGenres().forEach(genre -> {
+            if (!genreRepository.existsById(genre.getId()))
+                throw new TestsWorkaroundException("Жанр с ID " + genre.getId() + " не найден");
+        });
     }
 }

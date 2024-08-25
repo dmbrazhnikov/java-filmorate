@@ -35,8 +35,7 @@ public class Film {
     @JsonProperty("duration")
     private Integer durationMinutes;
 
-    @JsonProperty("genre")
     private List<Genre> genres;
 
-    private MpaRating mpaRating;
+    private MpaRating mpa;
 }

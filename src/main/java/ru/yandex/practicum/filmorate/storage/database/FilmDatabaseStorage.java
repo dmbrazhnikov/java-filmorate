@@ -104,7 +104,7 @@ public class FilmDatabaseStorage implements IFilmStorage {
     }
 
     private void saveFilmRating(Film film) {
-        MpaRating rating = film.getMpaRating();
+        MpaRating rating = film.getMpa();
         if (rating != null) {
             if (!ratingRepo.existsById(rating.getId()))
                 throw new NotFoundException("Рейтинг с ID " + rating.getId() + " не найден");
@@ -140,7 +140,7 @@ public class FilmDatabaseStorage implements IFilmStorage {
                 .build();
         FilmRatingDao filmRating = filmRatingRepo.findFirstByFilmId(filmDao.getId());
         if (filmRating != null)
-            film.setMpaRating(ratingRepo.findById(filmRating.getRatingId()).get());
+            film.setMpa(ratingRepo.findById(filmRating.getRatingId()).get());
         List<FilmGenreDao> filmGenreDaos = filmGenreRepo.findAllByFilmId(filmDao.getId());
         List<Genre> filmGenres = filmGenreDaos.stream()
                 .map(filmGenreDao -> genreRepo.findById(filmGenreDao.getGenreId()).get())
