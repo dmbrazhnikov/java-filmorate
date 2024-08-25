@@ -20,5 +20,5 @@ public interface IFilmStorage {
 
     void unsetLike(Long filmId, Long userId);
 
-    Map<Long, Set<Long>> getLikedUserIdsByFilmId();
+    Map<Long, Set<Long>> getAllLikesForFilmIds();
 }

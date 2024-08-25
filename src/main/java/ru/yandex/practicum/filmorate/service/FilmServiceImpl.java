@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.database.FilmDatabaseStorage;
@@ -30,7 +29,6 @@ public class FilmServiceImpl implements IFilmService {
     // Обновление
     @Override
     public Film update(Film film) {
-        get(film.getId()); // Костыль: тест, в нарушение RFC9110, ожидает 404 в ответ на попытку обновить несуществующий фильм
         filmStorage.update(film);
         return film;
     }
@@ -38,9 +36,7 @@ public class FilmServiceImpl implements IFilmService {
     // Получение по ID
     @Override
     public Film get(Long id) {
-        return Optional.ofNullable(filmStorage.get(id)).orElseThrow(
-                () -> new NotFoundException("Фильм с ID " + id + " не найден")
-        );
+        return filmStorage.get(id);
     }
 
     // Получение всех
@@ -69,7 +65,7 @@ public class FilmServiceImpl implements IFilmService {
     @Override
     public List<Film> getMostPopular(int count) {
         SortedMap<Integer, Long> likesByFilmId = new TreeMap<>(Comparator.reverseOrder());
-        filmStorage.getLikedUserIdsByFilmId().forEach((filmId, likedUserIds) -> {
+        filmStorage.getAllLikesForFilmIds().forEach((filmId, likedUserIds) -> {
             if (!likedUserIds.isEmpty())
                 likesByFilmId.put(likedUserIds.size(), filmId);
         });

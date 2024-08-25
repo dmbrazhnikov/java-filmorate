@@ -33,7 +33,7 @@ Table film_genre {
   genre_id int [ref: > genre.id]
 }
 
-Table film_user_like {
+Table film_likes {
   id int [primary key]
   film_id int [ref: > film.id]
   user_id int [ref: > user.id]

@@ -11,7 +11,7 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.validation.IsAfter;
 import ru.yandex.practicum.filmorate.validation.UpdateValidationGroup;
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 
 @Builder(toBuilder = true)
@@ -36,7 +36,7 @@ public class Film {
     private Integer durationMinutes;
 
     @JsonProperty("genre")
-    private Set<Genre> genres;
+    private List<Genre> genres;
 
     private MpaRating mpaRating;
 }

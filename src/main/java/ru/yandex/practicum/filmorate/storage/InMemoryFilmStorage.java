@@ -52,7 +52,7 @@ public class InMemoryFilmStorage implements IFilmStorage {
     }
 
     @Override
-    public Map<Long, Set<Long>> getLikedUserIdsByFilmId() {
+    public Map<Long, Set<Long>> getAllLikesForFilmIds() {
         return new HashMap<>(likedUserIdsByFilmId);
     }
 }
