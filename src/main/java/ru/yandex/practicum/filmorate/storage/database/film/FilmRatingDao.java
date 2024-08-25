@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.database;
+package ru.yandex.practicum.filmorate.storage.database.film;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

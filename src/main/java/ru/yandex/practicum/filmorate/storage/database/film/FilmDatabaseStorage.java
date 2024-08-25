@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.database;
+package ru.yandex.practicum.filmorate.storage.database.film;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.IFilmStorage;
+import ru.yandex.practicum.filmorate.storage.database.GenreRepository;
+import ru.yandex.practicum.filmorate.storage.database.MpaRatingRepository;
 
 import java.util.*;
 
@@ -26,13 +28,13 @@ public class FilmDatabaseStorage implements IFilmStorage {
 
     @Override
     public void add(Film film) {
-        FilmDao dao = FilmDao.builder()
+        FilmDao filmDao = FilmDao.builder()
                 .name(film.getName())
                 .description(film.getDescription())
                 .releaseDate(film.getReleaseDate())
                 .durationMinutes(film.getDurationMinutes())
                 .build();
-        FilmDao savedFilmDao = filmDaoRepo.save(dao);
+        FilmDao savedFilmDao = filmDaoRepo.save(filmDao);
         film.setId(savedFilmDao.getId());
         saveFilmRating(film);
         saveFilmGenres(film);

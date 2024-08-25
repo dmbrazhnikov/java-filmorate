@@ -1,22 +1,24 @@
-package ru.yandex.practicum.filmorate.storage.database;
+package ru.yandex.practicum.filmorate.storage.database.film;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.time.LocalDate;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "film_likes")
-public class FilmLikeDao {
+@Table(name = "films")
+public class FilmDao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long filmId;
-    private Long userId;
+    private String name, description;
+    private LocalDate releaseDate;
+    private Integer durationMinutes;
 }

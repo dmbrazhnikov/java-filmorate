@@ -1,30 +1,30 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.IUserStorage;
+import ru.yandex.practicum.filmorate.storage.database.user.UserDao;
+import ru.yandex.practicum.filmorate.storage.database.user.UserDatabaseStorage;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 
 @Service
-@RequiredArgsConstructor
 public class UserServiceImpl implements IUserService {
 
     private final IUserStorage userStorage;
-    private static final AtomicLong idSequence = new AtomicLong(1);
+
+    public UserServiceImpl(UserDatabaseStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
     /* При создании значение поля User.id обязано быть пустым: управлять идентификаторами может исключительно сервер,
     а значит, клиент обязан прислать данные без идентификатора. Поэтому бездумно вешать валидацию на null нельзя. */
     @Override
     public User add(User user) {
-        Long userId = idSequence.getAndIncrement();
-        user.setId(userId);
+
         userStorage.add(user);
         return user;
     }
