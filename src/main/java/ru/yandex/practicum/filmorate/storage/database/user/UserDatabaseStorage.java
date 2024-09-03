@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static ru.yandex.practicum.filmorate.storage.database.user.FriendshipStatus.CONFIRMED;
+import static ru.yandex.practicum.filmorate.storage.database.user.FriendshipStatus.REQUESTED;
+
 
 @RequiredArgsConstructor
 @Component
@@ -17,16 +20,17 @@ import java.util.Set;
 public class UserDatabaseStorage implements IUserStorage {
 
     private final UserDaoRepository userDaoRepo;
+    private final UserFriendshipRepository userFriendshipRepo;
 
     @Override
     public void add(User user) {
-        UserDao incomingUserDao = UserDao.builder()
+        UserDao newUserDao = UserDao.builder()
                 .login(user.getLogin())
                 .name(Optional.ofNullable(user.getName()).orElse(user.getLogin()))
                 .email(user.getEmail())
                 .birthDate(user.getBirthday())
                 .build();
-        UserDao savedUserDao = userDaoRepo.save(incomingUserDao);
+        UserDao savedUserDao = userDaoRepo.save(newUserDao);
         user.setId(savedUserDao.getId());
     }
 
@@ -35,13 +39,14 @@ public class UserDatabaseStorage implements IUserStorage {
         if (!userDaoRepo.existsById(user.getId()))
             // Костыль: тест, нарушая RFC9110, ожидает 404 в ответ на попытку обновить несуществующий фильм
             throw new NotFoundException("Пользователь с ID " + user.getId() + " не найден");
-        UserDao incomingUserDao = UserDao.builder()
+        UserDao updatedUserDao = UserDao.builder()
+                .id(user.getId())
                 .login(user.getLogin())
                 .name(Optional.ofNullable(user.getName()).orElse(user.getLogin()))
                 .email(user.getEmail())
                 .birthDate(user.getBirthday())
                 .build();
-        userDaoRepo.save(incomingUserDao);
+        userDaoRepo.save(updatedUserDao);
     }
 
     @Override
@@ -60,18 +65,37 @@ public class UserDatabaseStorage implements IUserStorage {
     }
 
     @Override
-    public void setFriendship(Long userId, Long friendUserId) {
-        
-        // TODO Реализация
+    public void requestFriendship(Long userId, Long friendUserId) {
+        UsersFriendship newUserFriendShip = UsersFriendship.builder()
+                .userId(userId)
+                .friendUserId(friendUserId)
+                .friendshipStatus(REQUESTED)
+                .build();
+        userFriendshipRepo.save(newUserFriendShip);
+    }
+
+    @Override
+    public void confirmFriendship(Long userId, Long friendUserId) {
+        UsersFriendship userFriendShip = Optional.ofNullable(
+                userFriendshipRepo.findFirstByUserIdAndFriendUserIdAndFriendshipStatus(userId, friendUserId, REQUESTED)
+        ).orElseThrow(
+                () -> new NotFoundException("Пользователь с ID " + friendUserId
+                        + " не запрашивал добавление в друзья пользователя с ID " + userId)
+        );
+        userFriendShip.setFriendshipStatus(CONFIRMED);
+        userFriendshipRepo.save(userFriendShip);
     }
 
     @Override
     public void unsetFriendship(Long userId, Long friendUserId) {
-        // TODO Реализация
+        UsersFriendship userFriendShip = userFriendshipRepo.findFirstByUserIdAndFriendUserId(userId, friendUserId);
+        if (userFriendShip != null)
+            userFriendshipRepo.delete(userFriendShip);
     }
 
     @Override
     public Set<Long> getUserFriendsIds(Long userId) {
+        // TODO Реализация
         return Set.of();
     }
 

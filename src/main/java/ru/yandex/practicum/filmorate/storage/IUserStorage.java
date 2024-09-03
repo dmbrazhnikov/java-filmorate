@@ -15,7 +15,9 @@ public interface IUserStorage {
 
     List<User> getAll();
 
-    void setFriendship(Long userId, Long friendUserId);
+    void requestFriendship(Long userId, Long friendUserId);
+
+    void confirmFriendship(Long userId, Long friendUserId);
 
     void unsetFriendship(Long userId, Long friendUserId);
 

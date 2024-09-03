@@ -1,13 +1,13 @@
 package ru.yandex.practicum.filmorate.storage.database.user;
 
-import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+@Getter
+@RequiredArgsConstructor
+public enum FriendshipStatus {
 
-@Entity
-@Table(name = "friendship_status")
-public class FriendshipStatus {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    private String name;
+    REQUESTED("запрошена"), CONFIRMED("подтверждена");
+
+    private final String name;
 }

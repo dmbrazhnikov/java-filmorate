@@ -44,4 +44,10 @@ public class CustomExceptionHandler {
         log.error("Возникло исключение", e);
         return new ErrorDTO("Возникло исключение", e.getMessage());
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(BAD_REQUEST)
+    public ErrorDTO processIllegalArgumentException(IllegalArgumentException e) {
+        return new ErrorDTO("Некорректное значение", e.getMessage());
+    }
 }

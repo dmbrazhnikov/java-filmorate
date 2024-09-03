@@ -1,13 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.IUserStorage;
-import ru.yandex.practicum.filmorate.storage.database.user.UserDao;
 import ru.yandex.practicum.filmorate.storage.database.user.UserDatabaseStorage;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 
@@ -20,29 +17,21 @@ public class UserServiceImpl implements IUserService {
         this.userStorage = userStorage;
     }
 
-    /* При создании значение поля User.id обязано быть пустым: управлять идентификаторами может исключительно сервер,
-    а значит, клиент обязан прислать данные без идентификатора. Поэтому бездумно вешать валидацию на null нельзя. */
     @Override
     public User add(User user) {
-
         userStorage.add(user);
         return user;
     }
 
-    /* При обновлении поле User.id должно быть заполнено. Для негативного результата проверки этого условия и сделано
-    * отдельное исключение по аналогии с NotFoundException. */
     @Override
     public User update(User user) {
-        get(user.getId()); // Костыль: тест, в нарушение RFC9110, ожидает 404 в ответ на попытку обновить несуществующего пользователя
         userStorage.update(user);
         return user;
     }
 
     @Override
     public User get(Long id) {
-        return Optional.ofNullable(userStorage.get(id)).orElseThrow(
-                () -> new NotFoundException("Пользователь с ID " + id + " не найден")
-        );
+        return userStorage.get(id);
     }
 
     @Override
@@ -54,7 +43,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public void setFriendship(Long userId, Long friendUserId) {
         User user = get(userId), friendUser = get(friendUserId);
-        userStorage.setFriendship(user.getId(), friendUser.getId());
+        userStorage.requestFriendship(user.getId(), friendUser.getId());
     }
 
     // удаление из друзей

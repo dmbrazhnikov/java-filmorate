@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.TestsWorkaroundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.database.FilmDatabaseStorage;
+import ru.yandex.practicum.filmorate.storage.database.film.FilmDatabaseStorage;
 import ru.yandex.practicum.filmorate.storage.IFilmStorage;
 import ru.yandex.practicum.filmorate.storage.database.GenreRepository;
 import ru.yandex.practicum.filmorate.storage.database.MpaRatingRepository;
