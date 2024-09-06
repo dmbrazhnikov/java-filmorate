@@ -8,7 +8,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.IUserStorage;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import static ru.yandex.practicum.filmorate.storage.database.user.FriendshipStatus.CONFIRMED;
 import static ru.yandex.practicum.filmorate.storage.database.user.FriendshipStatus.REQUESTED;
@@ -94,9 +94,11 @@ public class UserDatabaseStorage implements IUserStorage {
     }
 
     @Override
-    public Set<Long> getUserFriendsIds(Long userId) {
-        // TODO Реализация
-        return Set.of();
+    public List<Long> getUserFriendsIds(Long userId) {
+        return userFriendshipRepo.findAllByUserId(userId).stream()
+                //.filter(usersFriendship -> usersFriendship.getFriendshipStatus() == CONFIRMED)
+                .map(UsersFriendship::getFriendUserId)
+                .collect(Collectors.toList());
     }
 
     private static User getUserByDao(UserDao userDao) {

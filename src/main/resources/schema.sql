@@ -52,3 +52,4 @@ CREATE TABLE IF NOT EXISTS users_friendship (
 	last_updated TIMESTAMP DEFAULT now(),
     UNIQUE (user_id, friend_user_id)
 );
+CREATE INDEX IF NOT EXISTS ON users_friendship (user_id);

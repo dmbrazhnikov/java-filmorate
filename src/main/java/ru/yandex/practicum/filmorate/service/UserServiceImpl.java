@@ -5,7 +5,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.IUserStorage;
 import ru.yandex.practicum.filmorate.storage.database.user.UserDatabaseStorage;
 import java.util.List;
-import java.util.Set;
 
 
 @Service
@@ -57,7 +56,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public List<User> getMutualFriends(Long user1Id, Long user2Id) {
         User user1 = get(user1Id), user2 = get(user2Id);
-        Set<Long> user1FriendsIds = userStorage.getUserFriendsIds(user1.getId()),
+        List<Long> user1FriendsIds = userStorage.getUserFriendsIds(user1.getId()),
                 user2FriendsIds = userStorage.getUserFriendsIds(user2.getId());
         if (!user1FriendsIds.isEmpty() && !user2FriendsIds.isEmpty())
             user1FriendsIds.retainAll(user2FriendsIds);
