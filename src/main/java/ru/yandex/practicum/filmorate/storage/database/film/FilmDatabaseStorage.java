@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.IFilmStorage;
 import ru.yandex.practicum.filmorate.storage.database.GenreRepository;
 import ru.yandex.practicum.filmorate.storage.database.MpaRatingRepository;
-
 import java.util.*;
 
 
@@ -115,21 +114,22 @@ public class FilmDatabaseStorage implements IFilmStorage {
     }
 
     private void saveFilmGenres(Film film) {
-        List<Genre> genres = film.getGenres();
-        if (genres != null) {
-            List<FilmGenreDao> filmGenres = new ArrayList<>(genres.size());
-            genres.forEach(genre -> {
-                if (!genreRepo.existsById(genre.getId()))
-                    throw new NotFoundException("Жанр с ID " + genre.getId() + " не найден");
-                filmGenres.add(
-                        FilmGenreDao.builder()
-                                .filmId(film.getId())
-                                .genreId(genre.getId())
-                                .build()
-                );
-            });
-            filmGenreRepo.saveAll(filmGenres);
-        }
+        Optional.ofNullable(film.getGenres()).ifPresent(
+                genres -> {
+                    List<FilmGenreDao> filmGenreDaos = new ArrayList<>(genres.size());
+                    genres.forEach(genre -> {
+                        if (!genreRepo.existsById(genre.getId()))
+                            throw new NotFoundException("Жанр с ID " + genre.getId() + " не найден");
+                        filmGenreDaos.add(
+                                FilmGenreDao.builder()
+                                        .filmId(film.getId())
+                                        .genreId(genre.getId())
+                                        .build()
+                        );
+                    });
+                    filmGenreRepo.saveAll(filmGenreDaos);
+                }
+        );
     }
 
     private Film getFilmByDao(FilmDao filmDao) {

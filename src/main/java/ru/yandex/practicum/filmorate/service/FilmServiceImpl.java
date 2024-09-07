@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.TestsWorkaroundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.database.film.FilmDatabaseStorage;
 import ru.yandex.practicum.filmorate.storage.IFilmStorage;
@@ -92,9 +94,17 @@ public class FilmServiceImpl implements IFilmService {
     private void checkFilmGenresAndRating(Film film) {
         if (!ratingRepository.existsById(film.getMpa().getId()))
             throw new TestsWorkaroundException("Рейтинг с ID " + film.getMpa().getId() + " не найден");
-        film.getGenres().forEach(genre -> {
-            if (!genreRepository.existsById(genre.getId()))
-                throw new TestsWorkaroundException("Жанр с ID " + genre.getId() + " не найден");
-        });
+        Optional<List<Genre>> genresOpt = Optional.ofNullable(film.getGenres());
+        if (genresOpt.isPresent()) {
+            Set<Genre> genresTreeSet = new TreeSet<>(Comparator.comparing(Genre::getId));
+            genresOpt.get().forEach(
+                    genre -> {
+                        if (!genreRepository.existsById(genre.getId()))
+                            throw new NotFoundException("Жанр с ID " + genre.getId() + " не найден");
+                        genresTreeSet.add(genre);
+                    }
+            );
+            film.setGenres(genresTreeSet.stream().toList());
+        }
     }
 }
