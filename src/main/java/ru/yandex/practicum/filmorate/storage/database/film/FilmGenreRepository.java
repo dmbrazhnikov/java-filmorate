@@ -7,6 +7,7 @@ import java.util.List;
 
 @Repository
 public interface FilmGenreRepository extends JpaRepository<FilmGenreDao, Long> {
+
     void deleteAllByFilmId(Long filmId);
     List<FilmGenreDao> findAllByFilmId(Long filmId);
 }
