@@ -9,5 +9,6 @@ import java.util.List;
 public interface FilmGenreRepository extends JpaRepository<FilmGenreDao, Long> {
 
     void deleteAllByFilmId(Long filmId);
+
     List<FilmGenreDao> findAllByFilmId(Long filmId);
 }
