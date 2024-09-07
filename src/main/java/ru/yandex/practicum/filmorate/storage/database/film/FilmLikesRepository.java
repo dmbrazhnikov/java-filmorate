@@ -5,6 +5,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FilmLikesRepository extends JpaRepository<FilmLikeDao, Long> {
+
     boolean existsByFilmIdAndUserId(Long filmId, Long userId);
+
     void deleteByFilmIdAndUserId(Long filmId, Long userId);
 }

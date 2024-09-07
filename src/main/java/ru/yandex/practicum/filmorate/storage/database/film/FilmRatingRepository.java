@@ -5,6 +5,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FilmRatingRepository extends JpaRepository<FilmRatingDao, FilmRatingDao> {
+
     void deleteAllByFilmId(Long filmId);
+
     FilmRatingDao findFirstByFilmId(Long filmId);
 }
