@@ -32,10 +32,22 @@ public class CustomExceptionHandler {
         return new ErrorDTO("Не найдено", e.getMessage());
     }
 
+    @ExceptionHandler(TestsWorkaroundException.class)
+    @ResponseStatus(BAD_REQUEST)
+    public ErrorDTO yetAnotherBrilliantTestsWorkaround(TestsWorkaroundException e) {
+        return new ErrorDTO("Привет, кривые тесты!", e.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(INTERNAL_SERVER_ERROR)
     public ErrorDTO processAnyException(Exception e) {
         log.error("Возникло исключение", e);
         return new ErrorDTO("Возникло исключение", e.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(BAD_REQUEST)
+    public ErrorDTO processIllegalArgumentException(IllegalArgumentException e) {
+        return new ErrorDTO("Некорректное значение", e.getMessage());
     }
 }

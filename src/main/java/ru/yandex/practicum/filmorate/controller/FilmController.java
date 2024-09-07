@@ -48,7 +48,7 @@ public class FilmController {
     }
 
     @GetMapping("/{filmId}")
-    public Film getById(@PathVariable Integer filmId) {
+    public Film getById(@PathVariable Long filmId) {
         log.debug("Получен запрос данных фильма с ID {}", filmId);
         Film result = filmService.get(filmId);
         log.info("Найден фильм с ID {}", filmId);
@@ -58,7 +58,7 @@ public class FilmController {
     // пользователь удаляет лайк
     @PutMapping("/{filmId}/like/{userId}")
     @ResponseStatus(NO_CONTENT)
-    public void setLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
+    public void setLike(@PathVariable Long filmId, @PathVariable Long userId) {
         log.debug("Получен запрос добавления пользователем с ID {} отметки \"Нравится\" фильму с ID {}", userId, filmId);
         filmService.setLike(filmId, userId);
         log.debug("Пользователь с ID {} установил отметку \"Нравится\" фильму с ID {}", userId, filmId);
@@ -67,7 +67,7 @@ public class FilmController {
     // пользователь ставит лайк фильму
     @DeleteMapping("/{filmId}/like/{userId}")
     @ResponseStatus(NO_CONTENT)
-    public void unsetLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
+    public void unsetLike(@PathVariable Long filmId, @PathVariable Long userId) {
         log.debug("Получен запрос удаления пользователем с ID {} отметки \"Нравится\" для фильма с ID {}", userId, filmId);
         filmService.unsetLike(filmId, userId);
         log.debug("Пользователь с ID {} удалил отметку \"Нравится\" у фильма с ID {}", userId, filmId);

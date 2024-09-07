@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -10,15 +11,16 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.validation.IsAfter;
 import ru.yandex.practicum.filmorate.validation.UpdateValidationGroup;
 import java.time.LocalDate;
+import java.util.List;
 
 
-@Data
 @Builder(toBuilder = true)
+@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Film {
 
     @NotNull(groups = UpdateValidationGroup.class)
-    private Integer id;
+    private Long id;
 
     @NotEmpty(message = "название не может быть пустым")
     private String name;
@@ -30,5 +32,10 @@ public class Film {
     private LocalDate releaseDate;
 
     @Positive
-    private Integer duration;
+    @JsonProperty("duration")
+    private Integer durationMinutes;
+
+    private List<Genre> genres;
+
+    private MpaRating mpa;
 }
