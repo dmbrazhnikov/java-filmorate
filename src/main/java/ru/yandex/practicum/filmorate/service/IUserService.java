@@ -10,15 +10,15 @@ public interface IUserService {
 
     User update(User user);
 
-    User get(Integer userId);
+    User get(Long userId);
 
     List<User> getAll();
 
-    void setFriendship(Integer userId, Integer friendUserId);
+    void setFriendship(Long userId, Long friendUserId);
 
-    void unsetFriendship(Integer userId, Integer friendUserId);
+    void unsetFriendship(Long userId, Long friendUserId);
 
-    List<User> getMutualFriends(Integer user1Id, Integer user2Id);
+    List<User> getMutualFriends(Long user1Id, Long user2Id);
 
-    List<User> getUserFriends(Integer userId);
+    List<User> getUserFriends(Long userId);
 }

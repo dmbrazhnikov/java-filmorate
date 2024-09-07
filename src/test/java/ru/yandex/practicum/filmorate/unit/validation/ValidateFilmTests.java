@@ -102,7 +102,7 @@ public class ValidateFilmTests extends BaseValidationTest {
         @DisplayName("Минимальная корректная")
         void correct() {
             Film film = getRefFilm().toBuilder()
-                    .duration(1)
+                    .durationMinutes(1)
                     .build();
             validateCorrect(film);
         }
@@ -117,8 +117,8 @@ public class ValidateFilmTests extends BaseValidationTest {
         private static Stream<Arguments> provideWithIncorrectDuration() {
             refFilm = getRefFilm();
             return Stream.of(
-                    arguments(named("Ноль", refFilm.toBuilder().duration(0).build()), "должно быть больше 0"),
-                    arguments(named("Отрицательная", refFilm.toBuilder().duration(-1).build()), "должно быть больше 0")
+                    arguments(named("Ноль", refFilm.toBuilder().durationMinutes(0).build()), "должно быть больше 0"),
+                    arguments(named("Отрицательная", refFilm.toBuilder().durationMinutes(-1).build()), "должно быть больше 0")
             );
         }
     }
@@ -136,7 +136,7 @@ public class ValidateFilmTests extends BaseValidationTest {
     private static Film getRefFilm() {
         return Film.builder()
                 .name("Молчание ягнят")
-                .duration(118)
+                .durationMinutes(118)
                 .releaseDate(LocalDate.of(1991, 2, 14))
                 .build();
     }

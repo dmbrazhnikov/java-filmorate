@@ -1,13 +1,14 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.TestsWorkaroundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.database.film.FilmDatabaseStorage;
 import ru.yandex.practicum.filmorate.storage.IFilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.database.GenreRepository;
+import ru.yandex.practicum.filmorate.storage.database.MpaRatingRepository;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Service
@@ -15,18 +16,25 @@ public class FilmServiceImpl implements IFilmService {
 
     private final IFilmStorage filmStorage;
     private final IUserService userService;
-    private static final AtomicInteger idSequence = new AtomicInteger(1);
+    private final MpaRatingRepository ratingRepository;
+    private final GenreRepository genreRepository;
 
-    public FilmServiceImpl(InMemoryFilmStorage storage, UserServiceImpl userService) {
+    public FilmServiceImpl(
+            FilmDatabaseStorage storage,
+            UserServiceImpl userService,
+            MpaRatingRepository ratingRepository,
+            GenreRepository genreRepository
+    ) {
         filmStorage = storage;
         this.userService = userService;
+        this.ratingRepository = ratingRepository;
+        this.genreRepository = genreRepository;
     }
 
     // Сохранение
     @Override
     public Film add(Film film) {
-        int filmId = idSequence.getAndIncrement();
-        film.setId(filmId);
+        checkFilmGenresAndRating(film);
         filmStorage.add(film);
         return film;
     }
@@ -34,17 +42,15 @@ public class FilmServiceImpl implements IFilmService {
     // Обновление
     @Override
     public Film update(Film film) {
-        get(film.getId()); // Костыль: тест, в нарушение RFC9110, ожидает 404 в ответ на попытку обновить несуществующий фильм
+        checkFilmGenresAndRating(film);
         filmStorage.update(film);
         return film;
     }
 
     // Получение по ID
     @Override
-    public Film get(Integer id) {
-        return Optional.ofNullable(filmStorage.get(id)).orElseThrow(
-                () -> new NotFoundException("Фильм с ID " + id + " не найден")
-        );
+    public Film get(Long id) {
+        return filmStorage.get(id);
     }
 
     // Получение всех
@@ -55,7 +61,7 @@ public class FilmServiceImpl implements IFilmService {
 
     // Добавление отметки "Нравится"
     @Override
-    public void setLike(Integer filmId, Integer userId) {
+    public void setLike(Long filmId, Long userId) {
         Film film = get(filmId);
         User user = userService.get(userId);
         filmStorage.setLike(film.getId(), user.getId());
@@ -63,7 +69,7 @@ public class FilmServiceImpl implements IFilmService {
 
     // Удаление отметки "Нравится"
     @Override
-    public void unsetLike(Integer filmId, Integer userId) {
+    public void unsetLike(Long filmId, Long userId) {
         Film film = get(filmId);
         User user = userService.get(userId);
         filmStorage.unsetLike(film.getId(), user.getId());
@@ -72,8 +78,8 @@ public class FilmServiceImpl implements IFilmService {
     // Вывод 10 наиболее популярных фильмов
     @Override
     public List<Film> getMostPopular(int count) {
-        SortedMap<Integer, Integer> likesByFilmId = new TreeMap<>(Comparator.reverseOrder());
-        filmStorage.getLikedUserIdsByFilmId().forEach((filmId, likedUserIds) -> {
+        SortedMap<Integer, Long> likesByFilmId = new TreeMap<>(Comparator.reverseOrder());
+        filmStorage.getAllLikesForFilmIds().forEach((filmId, likedUserIds) -> {
             if (!likedUserIds.isEmpty())
                 likesByFilmId.put(likedUserIds.size(), filmId);
         });
@@ -81,5 +87,14 @@ public class FilmServiceImpl implements IFilmService {
                 .map(filmStorage::get)
                 .limit(count)
                 .toList();
+    }
+
+    private void checkFilmGenresAndRating(Film film) {
+        if (!ratingRepository.existsById(film.getMpa().getId()))
+            throw new TestsWorkaroundException("Рейтинг с ID " + film.getMpa().getId() + " не найден");
+        film.getGenres().forEach(genre -> {
+            if (!genreRepository.existsById(genre.getId()))
+                throw new TestsWorkaroundException("Жанр с ID " + genre.getId() + " не найден");
+        });
     }
 }

@@ -10,13 +10,13 @@ public interface IFilmService {
 
     Film update(Film film);
 
-    Film get(Integer filmId);
+    Film get(Long filmId);
 
     List<Film> getAll();
 
-    void setLike(Integer filmId, Integer userId);
+    void setLike(Long filmId, Long userId);
 
-    void unsetLike(Integer filmId, Integer userId);
+    void unsetLike(Long filmId, Long userId);
 
     List<Film> getMostPopular(int count);
 }

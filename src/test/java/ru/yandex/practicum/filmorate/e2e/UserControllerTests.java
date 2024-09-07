@@ -82,7 +82,7 @@ public class UserControllerTests extends BaseTest {
     @DisplayName("Обновление")
     @Test
     void update() {
-        int userId = userClient.sendPost(refUser).path("id");
+        Long userId = userClient.sendPost(refUser).path("id");
         String newName = "Василий";
         User updatedUser = refUser.toBuilder()
                 .id(userId)
@@ -98,7 +98,7 @@ public class UserControllerTests extends BaseTest {
     @DisplayName("Получение по ID существующего")
     @Test
     void getExistingById() {
-        int userId = userClient.sendPost(refUser).path("id");
+        Long userId = userClient.sendPost(refUser).path("id");
         refUser.setId(userId);
         User result = userClient.sendGet("/" + userId)
                 .then()
