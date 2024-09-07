@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.TestsWorkaroundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -100,7 +99,7 @@ public class FilmServiceImpl implements IFilmService {
             genresOpt.get().forEach(
                     genre -> {
                         if (!genreRepository.existsById(genre.getId()))
-                            throw new NotFoundException("Жанр с ID " + genre.getId() + " не найден");
+                            throw new TestsWorkaroundException("Жанр с ID " + genre.getId() + " не найден");
                         genresTreeSet.add(genre);
                     }
             );
