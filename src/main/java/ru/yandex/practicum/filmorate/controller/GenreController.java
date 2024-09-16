@@ -32,7 +32,7 @@ public class GenreController {
     }
 
     @GetMapping("/{genreId}")
-    public Genre getById(@PathVariable Long genreId) {
+    public Genre getById(@PathVariable long genreId) {
         log.debug("Получен запрос данных жанра с ID {}", genreId);
         Genre result = repo.findById(genreId).orElseThrow(
                 () -> new NotFoundException("Жанр с ID " + genreId + " не найден")

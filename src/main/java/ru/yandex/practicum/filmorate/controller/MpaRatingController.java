@@ -33,7 +33,7 @@ public class MpaRatingController {
     }
 
     @GetMapping("/{ratingId}")
-    public MpaRating getById(@PathVariable Long ratingId) {
+    public MpaRating getById(@PathVariable long ratingId) {
         log.debug("Получен запрос данных рейтинга с ID {}", ratingId);
         MpaRating result = repo.findById(ratingId).orElseThrow(
                 () -> new NotFoundException("Рейтинг с ID " + ratingId + " не найден")

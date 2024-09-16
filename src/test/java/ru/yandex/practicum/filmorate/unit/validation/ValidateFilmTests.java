@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmDto;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -21,7 +21,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 @DisplayName("Валидация атрибутов фильма")
 public class ValidateFilmTests extends BaseValidationTest {
 
-    private static Film refFilm;
+    private static FilmDto refFilm;
 
     @Test
     @DisplayName("Корректные значения всех полей")
@@ -32,7 +32,7 @@ public class ValidateFilmTests extends BaseValidationTest {
     @ParameterizedTest(name = "{0}")
     @DisplayName("Некорректное название")
     @MethodSource("provideWithIncorrectName")
-    void incorrect(Film film, String errorMessage) {
+    void incorrect(FilmDto film, String errorMessage) {
         validateIncorrect(film, errorMessage);
     }
 
@@ -43,17 +43,17 @@ public class ValidateFilmTests extends BaseValidationTest {
         @ParameterizedTest(name = "{0}")
         @DisplayName("Корректное")
         @MethodSource("provideWithCorrectDescription")
-        void correct(Film film) {
+        void correct(FilmDto film) {
             validateCorrect(film);
         }
 
         @Test
         @DisplayName("Превышение максимальной длины")
         void incorrect() {
-            Film film = getRefFilm().toBuilder()
+            FilmDto film = getRefFilm().toBuilder()
                     .name(new String(new char[200]).replace('\0', 'v'))
                     .build();
-            Set<ConstraintViolation<Film>> violations = validator.validate(film);
+            Set<ConstraintViolation<FilmDto>> violations = validator.validate(film);
             assertNotNull(
                     violations.stream()
                             .filter(v -> v.getMessage().equals("описание должно содержать не более 200 символов"))
@@ -77,7 +77,7 @@ public class ValidateFilmTests extends BaseValidationTest {
         @Test
         @DisplayName("Самая ранняя из разрешённых")
         void sameDateAsAllowed() {
-            Film film = getRefFilm().toBuilder()
+            FilmDto film = getRefFilm().toBuilder()
                     .releaseDate(LocalDate.of(1895, 12, 29))
                     .build();
             validateCorrect(film);
@@ -86,7 +86,7 @@ public class ValidateFilmTests extends BaseValidationTest {
         @Test
         @DisplayName("Самая поздняя из неразрешённых")
         void dateBeforeAllowed() {
-            Film film = getRefFilm().toBuilder()
+            FilmDto film = getRefFilm().toBuilder()
                     .releaseDate(LocalDate.of(1895, 12, 28))
                     .build();
             validateIncorrect(film, "дата должна быть позже 1895-12-28");
@@ -101,7 +101,7 @@ public class ValidateFilmTests extends BaseValidationTest {
         @Test
         @DisplayName("Минимальная корректная")
         void correct() {
-            Film film = getRefFilm().toBuilder()
+            FilmDto film = getRefFilm().toBuilder()
                     .durationMinutes(1)
                     .build();
             validateCorrect(film);
@@ -110,7 +110,7 @@ public class ValidateFilmTests extends BaseValidationTest {
         @ParameterizedTest(name = "{0}")
         @DisplayName("Некорректная")
         @MethodSource("provideWithIncorrectDuration")
-        void incorrect(Film film, String errorMessage) {
+        void incorrect(FilmDto film, String errorMessage) {
             validateIncorrect(film, errorMessage);
         }
 
@@ -133,8 +133,8 @@ public class ValidateFilmTests extends BaseValidationTest {
         );
     }
 
-    private static Film getRefFilm() {
-        return Film.builder()
+    private static FilmDto getRefFilm() {
+        return FilmDto.builder()
                 .name("Молчание ягнят")
                 .durationMinutes(118)
                 .releaseDate(LocalDate.of(1991, 2, 14))

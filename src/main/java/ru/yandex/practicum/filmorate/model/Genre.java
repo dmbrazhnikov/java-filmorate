@@ -1,17 +1,20 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.*;
 
 
-@Data
-@Entity
-@Table(name = "genres")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode(of = {"id"})
 public class Genre {
 
     @Id
     @NotNull
-    private Long id;
+    private Integer id;
     private String name;
 }

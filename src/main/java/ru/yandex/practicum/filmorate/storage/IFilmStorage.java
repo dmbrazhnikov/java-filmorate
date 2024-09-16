@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmDto;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -8,13 +8,15 @@ import java.util.Set;
 
 public interface IFilmStorage {
 
-    void add(Film film);
+    void add(FilmDto film);
 
-    void update(Film film);
+    void update(FilmDto film);
 
-    Film get(Long filmId);
+    FilmDto get(Long filmId);
 
-    List<Film> getAll();
+    List<FilmDto> getAll();
+
+    boolean existsById(Long filmId);
 
     void setLike(Long filmId, Long userId);
 

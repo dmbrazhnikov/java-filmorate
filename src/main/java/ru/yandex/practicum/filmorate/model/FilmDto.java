@@ -17,7 +17,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Film {
+public class FilmDto {
 
     @NotNull(groups = UpdateValidationGroup.class)
     private Long id;

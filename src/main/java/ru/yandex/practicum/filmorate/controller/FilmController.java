@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmDto;
 import ru.yandex.practicum.filmorate.service.FilmServiceImpl;
 import jakarta.validation.groups.Default;
 import ru.yandex.practicum.filmorate.validation.UpdateValidationGroup;
@@ -24,33 +24,33 @@ public class FilmController {
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
-    public Film add(@Validated @RequestBody Film film) {
+    public FilmDto add(@Validated @RequestBody FilmDto film) {
         log.debug("Получен запрос создания фильма:\n{}", film);
-        Film payload = filmService.add(film);
+        FilmDto payload = filmService.add(film);
         log.info("Фильм с ID {} добавлен", payload.getId());
         return payload;
     }
 
     @PutMapping(consumes = APPLICATION_JSON_VALUE)
-    public Film update(@Validated({UpdateValidationGroup.class, Default.class}) @RequestBody Film film) {
+    public FilmDto update(@Validated({UpdateValidationGroup.class, Default.class}) @RequestBody FilmDto film) {
         log.debug("Получен запрос обновления/создания фильма:\n{}", film);
-        Film payload = filmService.update(film);
+        FilmDto payload = filmService.update(film);
         log.info("Фильм с ID {} обновлён", payload.getId());
         return payload;
     }
 
     @GetMapping
-    public List<Film> getAll() {
+    public List<FilmDto> getAll() {
         log.debug("Получен запрос получения списка всех фильмов");
-        List<Film> result = filmService.getAll();
+        List<FilmDto> result = filmService.getAll();
         log.info("Отправлен список всех фильмов");
         return result;
     }
 
     @GetMapping("/{filmId}")
-    public Film getById(@PathVariable Long filmId) {
+    public FilmDto getById(@PathVariable long filmId) {
         log.debug("Получен запрос данных фильма с ID {}", filmId);
-        Film result = filmService.get(filmId);
+        FilmDto result = filmService.get(filmId);
         log.info("Найден фильм с ID {}", filmId);
         return result;
     }
@@ -58,7 +58,7 @@ public class FilmController {
     // пользователь удаляет лайк
     @PutMapping("/{filmId}/like/{userId}")
     @ResponseStatus(NO_CONTENT)
-    public void setLike(@PathVariable Long filmId, @PathVariable Long userId) {
+    public void setLike(@PathVariable long filmId, @PathVariable long userId) {
         log.debug("Получен запрос добавления пользователем с ID {} отметки \"Нравится\" фильму с ID {}", userId, filmId);
         filmService.setLike(filmId, userId);
         log.debug("Пользователь с ID {} установил отметку \"Нравится\" фильму с ID {}", userId, filmId);
@@ -67,7 +67,7 @@ public class FilmController {
     // пользователь ставит лайк фильму
     @DeleteMapping("/{filmId}/like/{userId}")
     @ResponseStatus(NO_CONTENT)
-    public void unsetLike(@PathVariable Long filmId, @PathVariable Long userId) {
+    public void unsetLike(@PathVariable long filmId, @PathVariable long userId) {
         log.debug("Получен запрос удаления пользователем с ID {} отметки \"Нравится\" для фильма с ID {}", userId, filmId);
         filmService.unsetLike(filmId, userId);
         log.debug("Пользователь с ID {} удалил отметку \"Нравится\" у фильма с ID {}", userId, filmId);
@@ -75,7 +75,7 @@ public class FilmController {
 
     // список первых N фильмов по количеству отметок "Нравится"
     @GetMapping("/popular")
-    public List<Film> getMostPopular(@RequestParam(required = false, defaultValue = "10") Integer count) {
+    public List<FilmDto> getMostPopular(@RequestParam(required = false, defaultValue = "10") Integer count) {
         log.debug("Получен запрос списка из {} фильмов с наибольшим количеством отметок \"Нравится\"", count);
         return filmService.getMostPopular(count);
     }

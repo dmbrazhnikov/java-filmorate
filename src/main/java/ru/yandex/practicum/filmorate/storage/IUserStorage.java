@@ -14,6 +14,8 @@ public interface IUserStorage {
 
     List<User> getAll();
 
+    boolean existsById(Long filmId);
+
     void requestFriendship(Long userId, Long friendUserId);
 
     void confirmFriendship(Long userId, Long friendUserId);
