@@ -5,12 +5,10 @@ import ru.yandex.practicum.filmorate.exception.TestsWorkaroundException;
 import ru.yandex.practicum.filmorate.model.FilmDto;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.database.Film;
 import ru.yandex.practicum.filmorate.storage.database.FilmRepository;
 import ru.yandex.practicum.filmorate.storage.IFilmStorage;
 import ru.yandex.practicum.filmorate.storage.database.GenreRepository;
 import ru.yandex.practicum.filmorate.storage.database.MpaRatingRepository;
-
 import java.util.*;
 
 

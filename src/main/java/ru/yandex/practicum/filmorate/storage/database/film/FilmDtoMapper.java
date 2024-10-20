@@ -10,7 +10,7 @@ import java.util.List;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class FilmMapper {
+public class FilmDtoMapper {
 
     public static FilmDto mapToFilmDto(Film film, MpaRating rating, List<Genre> genres) {
 
